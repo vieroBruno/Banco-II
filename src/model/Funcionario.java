@@ -2,7 +2,7 @@ package model;
 
 public class Funcionario {
 
-    private int id_fornecedor;
+    private int id_funcionario;
     private String nome;
     private String cargo;
     private double salario;
@@ -16,8 +16,7 @@ public class Funcionario {
         this.telefone = telefone;
     }
 
-    public Funcionario(int id_fornecedor, String nome, String cargo, double salario, String telefone){
-        this.id_fornecedor = id_fornecedor;
+    public Funcionario(String nome, String cargo, double salario, String telefone){
         this.nome = nome;
         this.cargo = cargo;
         this.salario = salario;
@@ -48,12 +47,12 @@ public class Funcionario {
         this.salario = salario;
     }
 
-    public int getId_fornecedor() {
-        return id_fornecedor;
+    public int getIdFuncionario() {
+        return id_funcionario;
     }
 
-    public void setId_fornecedor(int id_fornecedor) {
-        this.id_fornecedor = id_fornecedor;
+    public void setIdFuncionario(int id_funcionario) {
+        this.id_funcionario = id_funcionario;
     }
 
     @Override
@@ -62,6 +61,7 @@ public class Funcionario {
                 " : nome='" + nome + '\'' +
                 ", cargo='" + cargo + '\'' +
                 ", salario=" + salario +
+                ", telefone="+ telefone+
                 '}';
     }
 }

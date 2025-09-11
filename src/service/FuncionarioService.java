@@ -16,8 +16,8 @@ public class FuncionarioService {
         this.repository = repository;
     }
 
-    public void cadastrarFuncionario(Funcionario funcionario, Connection con) throws SQLException {
-        repository.save(funcionario, con);
+    public void cadastrarFuncionario(Funcionario funcionario){
+        repository.save(funcionario);
     }
 
     public void editarFuncionario(Funcionario funcionario, Connection con) throws SQLException {
