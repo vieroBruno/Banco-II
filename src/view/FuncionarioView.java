@@ -17,8 +17,6 @@ public class FuncionarioView {
     private final FuncionarioService funcionarioService = new FuncionarioService(new JdbcFuncionarioRepository());
 
     public void exibirMenu() throws SQLException {
-        Conexao c = new Conexao();
-        Connection con = c.getConnection();
         while (true) {
             System.out.println("\n=== Gestão de Funcionários ===");
             System.out.println("1. Cadastrar Funcionário");
@@ -32,13 +30,13 @@ public class FuncionarioView {
 
             switch (opcao) {
                 case 1 :
-                        cadastrar(con);
+                        cadastrar();
                     break;
                 case 2 :
-                        listar(con);
+                       // listar();
                     break;
                 case 3 :
-                        editar(con);
+                        //editar();
                     break;
                 case 0 : { return; }
                 default : System.out.println("Opção inválida!");
@@ -46,7 +44,7 @@ public class FuncionarioView {
         }
     }
 
-    private void cadastrar(Connection con) throws SQLException {
+    private void cadastrar() {
 
         System.out.print("Nome: ");
         String nome = sc.nextLine();
@@ -60,8 +58,8 @@ public class FuncionarioView {
         System.out.print("Salário: ");
         double salario = sc.nextDouble();
 
-        Funcionario funcionario = new Funcionario(0,nome, cargo, salario, telefone);
-        funcionarioService.cadastrarFuncionario(funcionario, con);
+        Funcionario funcionario = new Funcionario(nome, cargo, salario, telefone);
+        funcionarioService.cadastrarFuncionario(funcionario);
     }
 
     private void editar(Connection con) throws SQLException {
@@ -78,10 +76,7 @@ public class FuncionarioView {
         System.out.print("Telefone: ");
         String telefone = sc.nextLine();
 
-        System.out.print("Id Funcionario: ");
-        int id_funcionario = sc.nextInt();
-
-        Funcionario funcionario = new Funcionario(id_funcionario, nome, cargo, salario, telefone);
+        Funcionario funcionario = new Funcionario(nome, cargo, salario, telefone);
         funcionarioService.editarFuncionario(funcionario, con);
     }
     private void listar(Connection con) throws SQLException {

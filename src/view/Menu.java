@@ -16,14 +16,11 @@ public class Menu {
             System.out.println("     SISTEMA PARA RESTAURANTE");
             System.out.println("===================================");
             System.out.println("1 - Funcionários");
-            System.out.println("2 - Fornecedores");
-            System.out.println("3 - Produtos / Estoque");
-            System.out.println("4 - Compras");
-            System.out.println("5 - Cardápio");
-            System.out.println("6 - Itens do Cardápio");
-            System.out.println("7 - Mesas");
-            System.out.println("8 - Pedidos");
-            System.out.println("9 - Reservas");
+            System.out.println("2 - Pedidos");
+            System.out.println("3 - Mesas");
+            System.out.println("4 - Item");
+            System.out.println("5 - Receitas");
+            System.out.println("6 - Produtos");
             System.out.println("0 - Sair");
             System.out.print("Escolha uma opção: ");
             opcao = sc.nextInt();
@@ -42,12 +39,6 @@ public class Menu {
                 case 5:
                     break;
                 case 6:
-                    break;
-                case 7:
-                    break;
-                case 8:
-                    break;
-                case 9:
                     break;
                 case 0:
                     break;

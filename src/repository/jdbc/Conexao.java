@@ -1,16 +1,16 @@
 package repository.jdbc;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.awt.*;
+import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Conexao {
 
-    private Connection con;
+    Connection con = null;
+    ResultSet rts = null;
 
-    public Conexao() {
+    public void Conect() {
         String driver = "org.postgresql.Driver";
         String user = "postgres";
         String senha = "123456";
@@ -20,20 +20,12 @@ public class Conexao {
             Class.forName(driver);
             this.con = (Connection) DriverManager.getConnection(url, user, senha);
             System.out.println("Conectado com sucesso");
-        } catch (ClassNotFoundException e) {
-            Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, e);
-            e.printStackTrace();
-            System.exit(1);
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException | HeadlessException e) {
             Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, e);
             e.printStackTrace();
             System.exit(1);
         }
 
-    }
-
-    public Connection getConnection() {
-        return con;
     }
 
     public void closeConnection(){
