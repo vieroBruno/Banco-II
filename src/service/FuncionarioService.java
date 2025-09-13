@@ -3,10 +3,7 @@ package service;
 import model.Funcionario;
 import repository.jdbc.JdbcFuncionarioRepository;
 
-import java.sql.SQLException;
 import java.util.HashSet;
-import java.util.List;
-import java.sql.Connection;
 
 
 public class FuncionarioService {
@@ -16,16 +13,16 @@ public class FuncionarioService {
         this.repository = repository;
     }
 
-    public void cadastrarFuncionario(Funcionario funcionario){
+    public void cadastrarFuncionario(Funcionario funcionario) {
         repository.save(funcionario);
     }
 
-    public void editarFuncionario(Funcionario funcionario, Connection con) throws SQLException {
-        repository.update(funcionario, con);
+    public void editarFuncionario(Funcionario funcionario) {
+        repository.update(funcionario);
     }
 
-    public HashSet listarFuncionario(Connection con) throws SQLException {
-        return repository.listAll(con);
+    public HashSet listarFuncionario() {
+        return repository.listAll();
     }
 
 }

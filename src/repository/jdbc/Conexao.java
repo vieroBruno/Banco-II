@@ -19,7 +19,6 @@ public class Conexao {
         try {
             Class.forName(driver);
             this.con = (Connection) DriverManager.getConnection(url, user, senha);
-            System.out.println("Conectado com sucesso");
         } catch (SQLException | ClassNotFoundException | HeadlessException e) {
             Logger.getLogger(Conexao.class.getName()).log(Level.SEVERE, null, e);
             e.printStackTrace();

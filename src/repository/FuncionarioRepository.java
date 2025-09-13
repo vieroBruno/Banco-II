@@ -9,8 +9,8 @@ import java.util.HashSet;
 public interface FuncionarioRepository {
 
     void save(Funcionario funcionario);
-    void update(Funcionario funcionario, Connection con) throws SQLException;
-    void delete(int id_funcionario, Connection con) throws SQLException;
-    Funcionario findById(int id_funcionario, Connection con);
-    HashSet listAll(Connection con) throws SQLException;
+    void update(Funcionario funcionario);
+    void delete(int id_funcionario);
+    Funcionario findById(int id_funcionario);
+    HashSet listAll();
 }
