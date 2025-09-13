@@ -61,7 +61,6 @@ public class Funcionario {
                 " : nome='" + nome + '\'' +
                 ", cargo='" + cargo + '\'' +
                 ", salario=" + salario +
-                ", telefone="+ telefone+
-                '}';
+                ", telefone="+ telefone;
     }
 }

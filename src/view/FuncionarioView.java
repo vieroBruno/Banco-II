@@ -1,7 +1,6 @@
 package view;
 
 import model.Funcionario;
-import repository.jdbc.Conexao;
 import repository.jdbc.JdbcFuncionarioRepository;
 import service.FuncionarioService;
 
@@ -33,10 +32,10 @@ public class FuncionarioView {
                         cadastrar();
                     break;
                 case 2 :
-                       // listar();
+                       listar();
                     break;
                 case 3 :
-                        //editar();
+                        editar();
                     break;
                 case 0 : { return; }
                 default : System.out.println("Opção inválida!");
@@ -62,7 +61,7 @@ public class FuncionarioView {
         funcionarioService.cadastrarFuncionario(funcionario);
     }
 
-    private void editar(Connection con) throws SQLException {
+    private void editar()  {
 
         System.out.print("Nome: ");
         String nome = sc.nextLine();
@@ -77,10 +76,10 @@ public class FuncionarioView {
         String telefone = sc.nextLine();
 
         Funcionario funcionario = new Funcionario(nome, cargo, salario, telefone);
-        funcionarioService.editarFuncionario(funcionario, con);
+        funcionarioService.editarFuncionario(funcionario);
     }
-    private void listar(Connection con) throws SQLException {
-        HashSet all = funcionarioService.listarFuncionario(con);
+    private void listar()  {
+        HashSet all = funcionarioService.listarFuncionario();
         Iterator<Funcionario> it = all.iterator();
         int cont = 0;
         while(it.hasNext()){
