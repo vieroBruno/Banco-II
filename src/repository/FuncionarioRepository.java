@@ -2,9 +2,8 @@ package repository;
 
 import model.Funcionario;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashSet;
+import java.util.List;
+
 
 public interface FuncionarioRepository {
 
@@ -12,5 +11,5 @@ public interface FuncionarioRepository {
     void update(Funcionario funcionario);
     void delete(int id_funcionario);
     Funcionario findById(int id_funcionario);
-    HashSet listAll();
+    List<Funcionario> listAll();
 }

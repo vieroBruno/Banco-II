@@ -16,7 +16,8 @@ public class Funcionario {
         this.telefone = telefone;
     }
 
-    public Funcionario(String nome, String cargo, double salario, String telefone){
+    public Funcionario(int id_funcionario, String nome, String cargo, double salario, String telefone){
+        this.id_funcionario = id_funcionario;
         this.nome = nome;
         this.cargo = cargo;
         this.salario = salario;
@@ -57,7 +58,7 @@ public class Funcionario {
 
     @Override
     public String toString() {
-        return "Funcionario"+
+        return
                 " : nome='" + nome + '\'' +
                 ", cargo='" + cargo + '\'' +
                 ", salario=" + salario +
