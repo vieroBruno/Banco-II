@@ -10,7 +10,7 @@ public class Conexao {
     Connection con = null;
     ResultSet rts = null;
 
-    public void Conect() {
+    public Conexao(){
         String driver = "org.postgresql.Driver";
         String user = "postgres";
         String senha = "123456";
@@ -25,6 +25,10 @@ public class Conexao {
             System.exit(1);
         }
 
+    }
+
+    public Connection getConnection() {
+            return con;
     }
 
     public void closeConnection(){

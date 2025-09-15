@@ -10,18 +10,20 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
-public class JdbcFuncionarioRepository extends Conexao implements FuncionarioRepository {
+public class JdbcFuncionarioRepository implements FuncionarioRepository {
 
     @Override
     public void save(Funcionario funcionario) {
-        Conect();
         String query = "INSERT INTO FUNCIONARIOS (nome, cargo, salario, telefone) VALUES (?,?,?,?)";
 
         try {
-            PreparedStatement st;
-            st = con.prepareStatement(query);
+            Connection con = new Conexao().getConnection();
+            PreparedStatement st  = con.prepareStatement(query);
+
             st.setString(1, funcionario.getNome());
             st.setString(2, funcionario.getCargo());
             st.setDouble(3, funcionario.getSalario());
@@ -32,15 +34,14 @@ public class JdbcFuncionarioRepository extends Conexao implements FuncionarioRep
         } catch (SQLException e) {
             throw new RepositoryException("Erro ao salvar funcionário", e);
         }
-        closeConnection();
     }
     public void update(Funcionario funcionario){
-        Conect();
         String query = "UPDATE FUNCIONARIOS SET nome=?, cargo=?, salario=?, telefone=? WHERE id_funcionario=?";
 
         try {
-            PreparedStatement st;
-            st = con.prepareStatement(query);
+            Connection con = new Conexao().getConnection();
+            PreparedStatement st  = con.prepareStatement(query);
+
             st.setString(1, funcionario.getNome());
             st.setString(2, funcionario.getCargo());
             st.setDouble(3, funcionario.getSalario());
@@ -52,15 +53,14 @@ public class JdbcFuncionarioRepository extends Conexao implements FuncionarioRep
         } catch (SQLException e) {
             throw new RepositoryException("Erro ao alterar funcionário", e);
         }
-        closeConnection();
     }
     public void delete(int id_funcionario){
-        Conect();
         String query= "DELETE FROM FUNCIONARIOS WHERE id_funcionario =?";
 
-        try{
-            PreparedStatement st;
-            st = con.prepareStatement(query);
+        try {
+            Connection con = new Conexao().getConnection();
+            PreparedStatement st  = con.prepareStatement(query);
+
             st.setInt(1, id_funcionario);
             st.execute();
             st.close();
@@ -68,32 +68,33 @@ public class JdbcFuncionarioRepository extends Conexao implements FuncionarioRep
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao excluir funcionário",e);
         }
-        closeConnection();
     }
     public Funcionario findById(int id_funcionario) {
         return null;
     }
-    public HashSet listAll() {
-        Conect();
-        Statement st;
-        String query = "SELECT nome, cargo, salario, telefone FROM FUNCIONARIOS";
-        HashSet list = new HashSet();
+
+    @Override
+    public List<Funcionario> listAll() {
+        String query = "SELECT id_funcionario, nome, cargo, salario, telefone FROM FUNCIONARIOS";
+        List<Funcionario> funcionarios = new ArrayList<>();
 
         try {
-            st = con.createStatement();
+            Connection con = new Conexao().getConnection();
+            Statement st = con.createStatement();
             ResultSet result = st.executeQuery(query);
             while(result.next()) {
-                list.add(new Funcionario(
-                    result.getString(1),
+                funcionarios.add(new Funcionario(
+                    result.getInt(1),
                     result.getString(2),
-                    result.getDouble(3),
-                    result.getString(4)
+                    result.getString(3),
+                    result.getDouble(4),
+                    result.getString(5)
                 ));
             }
         } catch (SQLException e) {
             throw  new RuntimeException("Erro ao listar funcionários", e);
         }
-        return list;
+        return funcionarios;
     }
 
 }

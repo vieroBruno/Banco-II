@@ -4,6 +4,7 @@ import model.Funcionario;
 import repository.jdbc.JdbcFuncionarioRepository;
 
 import java.util.HashSet;
+import java.util.List;
 
 
 public class FuncionarioService {
@@ -21,7 +22,7 @@ public class FuncionarioService {
         repository.update(funcionario);
     }
 
-    public HashSet listarFuncionario() {
+    public List<Funcionario> listarFuncionario() {
         return repository.listAll();
     }
 
