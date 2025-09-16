@@ -46,42 +46,12 @@ public class Menu {
                     System.out.println("Opção inválida! Tente novamente.");
             }
 
-            System.out.println();
 
         } while (opcao != 0);
     }
 
     public static void main(String[] args) throws SQLException {
         new Menu().start();
-    }
-
-    private void mostrarMenuCrud(String MenuOption) throws SQLException {
-        int option;
-        do {
-        System.out.println("  Escolha uma opção:  ");
-        System.out.println("1 - Cadastrar " + MenuOption );
-        System.out.println("2 - Listar "  + MenuOption);
-        System.out.println("3 - Alterar " + MenuOption);
-        System.out.println("4 - Deletar " + MenuOption);
-        System.out.println("0 - Voltar " + MenuOption);
-        option = sc.nextInt();
-        sc.nextLine();
-
-        switch (option) {
-            case 1:
-
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case 0:
-                new Menu().start();
-                break;
-        }
-        } while ( option != 0);
     }
 
 }

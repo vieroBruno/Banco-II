@@ -26,4 +26,8 @@ public class FuncionarioService {
         return repository.listAll();
     }
 
+    public void excluirFuncionario(int id_funcionario) {
+         repository.delete(id_funcionario);
+    }
+
 }

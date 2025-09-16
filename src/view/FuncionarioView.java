@@ -28,10 +28,13 @@ public class FuncionarioView {
                         cadastrar();
                     break;
                 case 2 :
-                       listar("listar");
+                        listar("listar");
                     break;
                 case 3 :
                         editar();
+                    break;
+                case 4 :
+                        excluir();
                     break;
                 case 0 : { return; }
                 default : System.out.println("Opção inválida!");
@@ -116,6 +119,57 @@ public class FuncionarioView {
         }
 
         return funcionarios;
+
+    }
+
+    private void excluir() {
+        System.out.println("\n--- Selecione o Funcionário para excluir ---");
+        List<Funcionario> funcionarios = listar("excluir");
+        System.out.println("0 - Cancelar");
+
+        int escolha = -1;
+        while (escolha < 0 || escolha > funcionarios.size()) {
+            System.out.println("Escolha uma opção:");
+            try {
+                escolha = sc.nextInt();
+                if (escolha < 0 || escolha > funcionarios.size()) {
+                    System.out.println("Opção inválida. Tente novamente!");
+                    sc.next();
+                }
+            } catch(InputMismatchException e) {
+                System.out.println("Entrada inválida. Por favor, digite um número.");
+                sc.next();
+            }
+        }
+        sc.nextLine();
+        if (escolha == 0) {
+            System.out.println("Operação cancelada!");
+            return;
+        }
+        Funcionario funcionarioParaExcluir = funcionarios.get(escolha - 1);
+
+        int escolhafinal = -1;
+        while(escolhafinal != 1 && escolhafinal != 2) {
+            System.out.println("Deseja realmente excluir esse funcionário? : " + funcionarioParaExcluir.getNome());
+            System.out.println("1. Sim");
+            System.out.println("2. Não");
+            try {
+                escolhafinal = sc.nextInt();
+                if(escolhafinal != 1 && escolhafinal != 2) {
+                    System.out.println("Opção inválida. Tente novamente!");
+                    sc.next();
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada inválida. Por favor, digite um número.");
+                sc.next();
+            }
+        }
+        sc.nextLine();
+        if (escolha == 2) {
+            System.out.println("Operação cancelada!");
+            return;
+        }
+        funcionarioService.excluirFuncionario(funcionarioParaExcluir.getIdFuncionario());
 
     }
 
