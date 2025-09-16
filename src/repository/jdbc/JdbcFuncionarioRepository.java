@@ -35,6 +35,8 @@ public class JdbcFuncionarioRepository implements FuncionarioRepository {
             throw new RepositoryException("Erro ao salvar funcionário", e);
         }
     }
+
+    @Override
     public void update(Funcionario funcionario){
         String query = "UPDATE FUNCIONARIOS SET nome=?, cargo=?, salario=?, telefone=? WHERE id_funcionario=?";
 
@@ -54,6 +56,8 @@ public class JdbcFuncionarioRepository implements FuncionarioRepository {
             throw new RepositoryException("Erro ao alterar funcionário", e);
         }
     }
+
+    @Override
     public void delete(int id_funcionario){
         String query= "DELETE FROM FUNCIONARIOS WHERE id_funcionario =?";
 
@@ -69,6 +73,7 @@ public class JdbcFuncionarioRepository implements FuncionarioRepository {
             throw new RuntimeException("Erro ao excluir funcionário",e);
         }
     }
+    @Override
     public Funcionario findById(int id_funcionario) {
         return null;
     }
