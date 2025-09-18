@@ -1,6 +1,5 @@
 package view;
 
-import service.FuncionarioService;
 
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -33,6 +32,7 @@ public class Menu {
                 case 2:
                     break;
                 case 3:
+                    new MesaView().exibirMenu();
                     break;
                 case 4:
                     break;

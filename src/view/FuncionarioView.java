@@ -63,6 +63,10 @@ public class FuncionarioView {
     private void editar()  {
         System.out.println("\n--- Selecione o Funcionário para editar ---");
         List<Funcionario> funcionarios = listar("editar");
+
+        if(funcionarios.isEmpty()) {
+            return;
+        }
         System.out.println("0 - Cancelar");
 
         int escolha = -1;
@@ -125,6 +129,11 @@ public class FuncionarioView {
     private void excluir() {
         System.out.println("\n--- Selecione o Funcionário para excluir ---");
         List<Funcionario> funcionarios = listar("excluir");
+
+        if(funcionarios.isEmpty()) {
+            return;
+        }
+
         System.out.println("0 - Cancelar");
 
         int escolha = -1;
