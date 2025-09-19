@@ -30,13 +30,16 @@ public class Menu {
                     new FuncionarioView().exibirMenu();
                     break;
                 case 2:
+                    new PedidoView().exibirMenu();
                     break;
                 case 3:
                     new MesaView().exibirMenu();
                     break;
                 case 4:
+                    new ItemView().exibirMenu();
                     break;
                 case 5:
+                    new ReceitaView().exibirMenu();
                     break;
                 case 6:
                     break;
