@@ -37,7 +37,7 @@ public class Mesa {
 
     public String toString() {
         return
-                " : numero='" + numero + '\'' +
-                ", capacidade='" + capacidade;
+                " : numero=" + numero +
+                ", capacidade=" + capacidade;
     }
 }

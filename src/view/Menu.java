@@ -1,6 +1,8 @@
 package view;
 
 
+import service.ProdutoService;
+
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -42,6 +44,7 @@ public class Menu {
                     new ReceitaView().exibirMenu();
                     break;
                 case 6:
+                    new ProdutoView().exibirMenu();
                     break;
                 case 0:
                     break;

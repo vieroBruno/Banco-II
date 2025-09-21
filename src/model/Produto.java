@@ -44,4 +44,11 @@ public class Produto {
     public void setQuantidade(int quantidade) {
         this.quantidade = quantidade;
     }
+
+    public String toString() {
+        return
+            " : nome='" + nome + '\'' +
+            ", unidade de medida='" + unidade_medida + '\'' +
+            ", quantidade=" + quantidade;
+    }
 }

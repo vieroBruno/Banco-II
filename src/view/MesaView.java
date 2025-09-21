@@ -86,7 +86,7 @@ public class MesaView {
 
 			Mesa mesaParaEditar = mesas.get(escolha -1);
 
-			System.out.println("Editando dados de: " + mesaParaEditar.getNumero());
+			System.out.println("Editando mesa numero: " + mesaParaEditar.getNumero());
 
 			System.out.print("Novo numero: ");
 			int numero = sc.nextInt();
