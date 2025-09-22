@@ -1,8 +1,8 @@
 package service;
 
+import model.Produto;
 import model.Receita;
 import repository.ReceitaRepository;
-import repository.jdbc.JdbcReceitaRepository;
 
 import java.util.List;
 
@@ -22,8 +22,8 @@ public class ReceitaService {
 		repository.update(receita);
 	}
 
-	public List<Receita> listarReceita() {
-		return repository.listAll();
+	public List<Produto> listarReceita(int id_item) {
+		return repository.listOne(id_item);
 	}
 
 	public void excluirReceita(int id_receita) {

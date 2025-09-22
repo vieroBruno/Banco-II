@@ -1,6 +1,7 @@
 package repository.jdbc;
 
 import exception.RepositoryException;
+import model.Produto;
 import model.Receita;
 import repository.ReceitaRepository;
 
@@ -67,21 +68,30 @@ public class JdbcReceitaRepository implements ReceitaRepository {
 	}
 
 	@Override
-	public List<Receita> listAll() {
-		String query = "SELECT fk_item_id_items, fk_produtos_id_produto, quantidade_necessaria FROM receitas";
-		List<Receita> receitas = new ArrayList<>();
+	public List<Produto> listOne(int id_item) {
+		String query = "select p.nome,\n" +
+                "\t   p.quantidade,\n" +
+                "\t   p.unidade_medida \n" +
+                "from item\n" +
+                "join receitas r \n" +
+                "on r.fk_item_id_items = item.id_items\n" +
+                "join produtos p\n" +
+                "on p.id_produto  = r.fk_produtos_id_produto \n" +
+                "and item.id_items ="+ id_item;
+		List<Produto> receitas = new ArrayList<>();
 
 		try (Connection con = new Conexao().getConnection();
-		     Statement st = con.createStatement();
+             Statement st = con.createStatement();
 		     ResultSet result = st.executeQuery(query)) {
 
-			while (result.next()) {
-				Receita receita = new Receita(
-					result.getInt("fk_item_id_items"),
-					result.getInt("fk_produtos_id_produto"),
-					result.getDouble("quantidade_necessaria")
-				);
-				receitas.add(receita);
+            while (result.next()) {
+                String nomeProduto = result.getString("nome");
+                int quantidade = result.getInt("quantidade");
+                String unidadeMedida = result.getString("unidade_medida");
+
+                // Formata a string para exibição
+                Produto produtos = new Produto(nomeProduto, unidadeMedida, quantidade );
+                receitas.add(produtos);
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException("Erro ao listar receitas", e);

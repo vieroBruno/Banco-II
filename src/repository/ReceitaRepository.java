@@ -1,5 +1,6 @@
 package repository;
 
+import model.Produto;
 import model.Receita;
 
 import java.util.List;
@@ -10,5 +11,5 @@ public interface ReceitaRepository {
 	void update(Receita receita);
 	void delete(int id_receita);
 	Receita findById(int id_receita);
-	List<Receita> listAll();
+	List<Produto> listOne(int id_item);
 }
