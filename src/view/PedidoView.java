@@ -1,8 +1,13 @@
 package view;
 
+import model.Funcionario;
+import model.Item;
 import model.Pedido;
+import model.Mesa;
+import repository.jdbc.JdbcMesaRepository;
 import repository.jdbc.JdbcPedidoRepository;
 import service.PedidoService;
+import service.MesaService;
 
 import java.time.LocalDate;
 import java.util.InputMismatchException;
@@ -13,6 +18,7 @@ public class PedidoView {
 
 	private final Scanner sc = new Scanner(System.in);
 	private final PedidoService pedidoService = new PedidoService(new JdbcPedidoRepository());
+    private final MesaService mesaService = new MesaService(new JdbcMesaRepository());
 
 	public void exibirMenu() {
 		while (true) {
@@ -49,17 +55,19 @@ public class PedidoView {
 	}
 
 	private void cadastrar() {
-		System.out.print("ID da Mesa: ");
-		int idMesa = sc.nextInt();
+        System.out.println("\n--- Novo Pedido ---");
 
-		System.out.print("ID do Funcionário: ");
-		int idFuncionario = sc.nextInt();
+        Mesa mesaSelecionado = selecionarMesa("para adionar um novo pedido");
+		if (mesaSelecionado == null) return;
+
+        Funcionario funcionarioSelecionado = selecionarFuncionario();
+        int idFuncionario = sc.nextInt();
 		sc.nextLine();
 
 		System.out.print("Status: ");
 		String status = sc.nextLine();
 
-		Pedido pedido = new Pedido(idMesa, 0, LocalDate.now(), status);
+		Pedido pedido = new Pedido(mesaSelecionado.getId_mesa(), 0, LocalDate.now(), status);
 		pedido.setId_funcionario(idFuncionario);
 		pedidoService.cadastrarPedido(pedido);
 	}
@@ -182,4 +190,80 @@ public class PedidoView {
 		}
 		pedidoService.excluirPedido(pedidoParaExcluir.getId_pedido());
 	}
+
+    private Mesa selecionarMesa(String acao) {
+        System.out.println("\n--- Selecione a Mesa " + acao + " ---");
+        List<Mesa> mesas = mesaService.listarMesa();
+
+        if (mesas.isEmpty()) {
+            System.out.println("Nenhuma mesa cadastrada.");
+            return null;
+        }
+
+        int cont = 0;
+        for (Mesa m : mesas) {
+            cont++;
+            System.out.println(cont + " - " + m.getNumero());
+        }
+        System.out.println("0 - Cancelar");
+
+        int escolha = -1;
+        while (escolha < 0 || escolha > mesas.size()) {
+            System.out.print("Escolha uma opção: ");
+            try {
+                escolha = sc.nextInt();
+                if (escolha < 0 || escolha > mesas.size()) {
+                    System.out.println("Opção inválida. Tente novamente!");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada inválida. Por favor, digite um número.");
+                sc.next();
+            }
+        }
+        sc.nextLine();
+
+        if (escolha == 0) {
+            System.out.println("Operação cancelada!");
+            return null;
+        }
+        return mesas.get(escolha - 1);
+    }
+
+    private Funcionario selecionarFuncionario() {
+        System.out.println("\n--- Selecione o Funcionario ---");
+        List<Mesa> mesas = mesaService.listarMesa();
+
+        if (mesas.isEmpty()) {
+            System.out.println("Nenhuma mesa cadastrada.");
+            return null;
+        }
+
+        int cont = 0;
+        for (Mesa m : mesas) {
+            cont++;
+            System.out.println(cont + " - " + m.getNumero());
+        }
+        System.out.println("0 - Cancelar");
+
+        int escolha = -1;
+        while (escolha < 0 || escolha > mesas.size()) {
+            System.out.print("Escolha uma opção: ");
+            try {
+                escolha = sc.nextInt();
+                if (escolha < 0 || escolha > mesas.size()) {
+                    System.out.println("Opção inválida. Tente novamente!");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada inválida. Por favor, digite um número.");
+                sc.next();
+            }
+        }
+        sc.nextLine();
+
+        if (escolha == 0) {
+            System.out.println("Operação cancelada!");
+            return null;
+        }
+        return mesas.get(escolha - 1);
+    }
 }
