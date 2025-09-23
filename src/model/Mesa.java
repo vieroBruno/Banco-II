@@ -3,11 +3,12 @@ package model;
 public class Mesa {
     private int id_mesa;
     private int numero;
-    private int capacacidade;
+    private int capacidade;
 
-    public Mesa(int numero, int capacacidade) {
+    public Mesa(int id_mesa,int numero, int capacidade) {
+        this.id_mesa = id_mesa;
         this.numero = numero;
-        this.capacacidade = capacacidade;
+        this.capacidade = capacidade;
     }
 
     public int getId_mesa() {
@@ -26,11 +27,17 @@ public class Mesa {
         this.numero = numero;
     }
 
-    public int getCapacacidade() {
-        return capacacidade;
+    public int getCapacidade() {
+        return capacidade;
     }
 
-    public void setCapacacidade(int capacacidade) {
-        this.capacacidade = capacacidade;
+    public void setCapacidade(int capacidade) {
+        this.capacidade = capacidade;
+    }
+
+    public String toString() {
+        return
+                " : numero=" + numero +
+                ", capacidade=" + capacidade;
     }
 }

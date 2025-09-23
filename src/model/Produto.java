@@ -4,10 +4,10 @@ public class Produto {
     private int id_produto;
     private String nome;
     private String unidade_medida;
-    private int quantidade;
+    private double quantidade;
 
 
-    public Produto(String nome, String unidade_medida, int quantidade) {
+    public Produto(String nome, String unidade_medida, double quantidade) {
         this.nome = nome;
         this.unidade_medida = unidade_medida;
         this.quantidade = quantidade;
@@ -37,11 +37,18 @@ public class Produto {
         this.unidade_medida = unidade_medida;
     }
 
-    public int getQuantidade() {
+    public double getQuantidade() {
         return quantidade;
     }
 
-    public void setQuantidade(int quantidade) {
+    public void setQuantidade(double quantidade) {
         this.quantidade = quantidade;
+    }
+
+    public String toString() {
+        return
+            " : nome='" + nome + '\'' +
+            ", unidade de medida='" + unidade_medida + '\'' +
+            ", quantidade=" + quantidade;
     }
 }

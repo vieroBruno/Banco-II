@@ -1,6 +1,7 @@
 package view;
 
-import service.FuncionarioService;
+
+import service.ProdutoService;
 
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -31,14 +32,19 @@ public class Menu {
                     new FuncionarioView().exibirMenu();
                     break;
                 case 2:
+                    new PedidoView().exibirMenu();
                     break;
                 case 3:
+                    new MesaView().exibirMenu();
                     break;
                 case 4:
+                    new ItemView().exibirMenu();
                     break;
                 case 5:
+                    new ReceitaView().exibirMenu();
                     break;
                 case 6:
+                    new ProdutoView().exibirMenu();
                     break;
                 case 0:
                     break;

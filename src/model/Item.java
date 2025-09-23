@@ -43,4 +43,11 @@ public class Item {
     public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
+
+    public String toString() {
+        return
+            " : nome='" + nome + '\'' +
+            ", preco de venda='" + preco_venda + '\'' +
+            ", descrição=" + descricao;
+    }
 }
