@@ -9,7 +9,7 @@ public interface ReceitaRepository {
 
 	void save(Receita receita);
 	void update(Receita receita);
-	void delete(int id_receita);
+	void delete(int id_receita, int id_produto);
 	Receita findById(int id_receita);
-	List<Produto> listOne(int id_item);
+	List<Produto> listarIngredientesItem(int id_item);
 }

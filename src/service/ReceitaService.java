@@ -23,10 +23,10 @@ public class ReceitaService {
 	}
 
 	public List<Produto> listarReceita(int id_item) {
-		return repository.listOne(id_item);
+		return repository.listarIngredientesItem(id_item);
 	}
 
-	public void excluirReceita(int id_receita) {
-		repository.delete(id_receita);
+	public void excluirReceita(int id_receita, int id_produto) {
+		repository.delete(id_receita, id_produto);
 	}
 }

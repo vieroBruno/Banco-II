@@ -55,7 +55,7 @@ public class ProdutoView {
         String unidadeMedida = sc.nextLine();
 
         System.out.print("Quantidade: ");
-        int quantidade = sc.nextInt();
+        double quantidade = sc.nextDouble();
 
         Produto produto = new Produto(nome, unidadeMedida, quantidade);
         produtoService.cadastrarProduto(produto);
@@ -100,7 +100,7 @@ public class ProdutoView {
         String unidadeMedida = sc.nextLine();
 
         System.out.print("Nova quantidade: ");
-        int quantidade = sc.nextInt();
+        double quantidade = sc.nextDouble();
 
 
         Produto produto = new Produto(nome, unidadeMedida, quantidade);

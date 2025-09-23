@@ -20,7 +20,7 @@ public class JdbcProdutoRepository implements ProdutoRepository {
 
             st.setString(1, produto.getNome());
             st.setString(2, produto.getUnidade_medida());
-            st.setInt(3, produto.getQuantidade());
+            st.setDouble(3, produto.getQuantidade());
             st.execute();
             System.out.println("Produto cadastrado com sucesso!");
         } catch (SQLException e) {
@@ -38,7 +38,7 @@ public class JdbcProdutoRepository implements ProdutoRepository {
 
             st.setString(1, produto.getNome());
             st.setString(2, produto.getUnidade_medida());
-            st.setInt(3, produto.getQuantidade());
+            st.setDouble(3, produto.getQuantidade());
             st.setInt(4, produto.getId_produto());
             st.execute();
             System.out.println("Produto alterado com sucesso!");
@@ -83,7 +83,7 @@ public class JdbcProdutoRepository implements ProdutoRepository {
                 Produto produto = new Produto(
                         result.getString("nome"),
                         result.getString("unidade_medida"),
-                        result.getInt("quantidade")
+                        result.getDouble("quantidade")
                 );
                 produto.setId_produto(result.getInt("id_produto"));
                 produtos.add(produto);

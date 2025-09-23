@@ -30,35 +30,35 @@ public class JdbcReceitaRepository implements ReceitaRepository {
 
 	@Override
 	public void update(Receita receita) {
-		String query = "UPDATE receitas SET fk_item_id_items=?, fk_produtos_id_produto=?, quantidade_necessaria=? WHERE id_receitas=?";
+        String query = "UPDATE receitas SET quantidade_necessaria = ? WHERE fk_item_id_items = ? AND fk_produtos_id_produto = ?";
 
-		try (Connection con = new Conexao().getConnection();
-		     PreparedStatement st = con.prepareStatement(query)) {
+        try (Connection con = new Conexao().getConnection();
+             PreparedStatement st = con.prepareStatement(query)) {
 
-			st.setInt(1, receita.getId_item());
-			st.setInt(2, receita.getId_produto());
-			st.setDouble(3, receita.getQuantidade());
-			//st.setInt(4, receita.getId_receita()); // Model não possui Id_receita
-			st.execute();
-			System.out.println("Receita alterada com sucesso!");
-		} catch (SQLException e) {
-			throw new RepositoryException("Erro ao alterar receita", e);
-		}
+            st.setDouble(1, receita.getQuantidade());
+            st.setInt(2, receita.getId_item());
+            st.setInt(3, receita.getId_produto());
+            st.execute();
+            System.out.println("Quantidade do ingrediente alterada com sucesso!");
+        } catch (SQLException e) {
+            throw new RepositoryException("Erro ao alterar receita", e);
+        }
 	}
 
 	@Override
-	public void delete(int id_receita) {
-		String query = "DELETE FROM receitas WHERE id_receitas=?";
+	public void delete(int id_item, int id_produto) {
+        String query = "DELETE FROM receitas WHERE fk_item_id_items = ? AND fk_produtos_id_produto = ?";
 
-		try (Connection con = new Conexao().getConnection();
-		     PreparedStatement st = con.prepareStatement(query)) {
+        try (Connection con = new Conexao().getConnection();
+             PreparedStatement st = con.prepareStatement(query)) {
 
-			st.setInt(1, id_receita);
-			st.execute();
-			System.out.println("Receita excluída com sucesso!");
-		} catch (SQLException e) {
-			throw new RuntimeException("Erro ao excluir receita", e);
-		}
+            st.setInt(1, id_item);
+            st.setInt(2, id_produto);
+            st.execute();
+            System.out.println("Ingrediente removido da receita com sucesso!");
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao excluir ingrediente da receita", e);
+        }
 	}
 
 	@Override
@@ -68,34 +68,33 @@ public class JdbcReceitaRepository implements ReceitaRepository {
 	}
 
 	@Override
-	public List<Produto> listOne(int id_item) {
-		String query = "select p.nome,\n" +
-                "\t   p.quantidade,\n" +
-                "\t   p.unidade_medida \n" +
-                "from item\n" +
-                "join receitas r \n" +
-                "on r.fk_item_id_items = item.id_items\n" +
-                "join produtos p\n" +
-                "on p.id_produto  = r.fk_produtos_id_produto \n" +
-                "and item.id_items ="+ id_item;
-		List<Produto> receitas = new ArrayList<>();
+    public List<Produto> listarIngredientesItem(int id_item) {
+        String query = "SELECT p.id_produto, p.nome, p.unidade_medida, r.quantidade_necessaria " +
+                "FROM item i " +
+                "JOIN receitas r ON r.fk_item_id_items = i.id_items " +
+                "JOIN produtos p ON p.id_produto = r.fk_produtos_id_produto " +
+                "WHERE i.id_items = ?";
+        List<Produto> ingredientes = new ArrayList<>();
 
-		try (Connection con = new Conexao().getConnection();
-             Statement st = con.createStatement();
-		     ResultSet result = st.executeQuery(query)) {
+        try (Connection con = new Conexao().getConnection();
+             PreparedStatement st = con.prepareStatement(query)) {
 
-            while (result.next()) {
-                String nomeProduto = result.getString("nome");
-                int quantidade = result.getInt("quantidade");
-                String unidadeMedida = result.getString("unidade_medida");
+            st.setInt(1, id_item);
 
-                // Formata a string para exibição
-                Produto produtos = new Produto(nomeProduto, unidadeMedida, quantidade );
-                receitas.add(produtos);
-			}
-		} catch (SQLException e) {
-			throw new RuntimeException("Erro ao listar receitas", e);
-		}
-		return receitas;
-	}
+            try (ResultSet result = st.executeQuery()) {
+                while (result.next()) {
+                    Produto produto = new Produto(
+                            result.getString("nome"),
+                            result.getString("unidade_medida"),
+                            (int) result.getDouble("quantidade_necessaria")
+                    );
+                    produto.setId_produto(result.getInt("id_produto"));
+                    ingredientes.add(produto);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar os ingredientes da receita", e);
+        }
+        return ingredientes;
+    }
 }
