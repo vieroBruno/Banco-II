@@ -1,11 +1,12 @@
 package view;
 
 import model.Funcionario;
-import model.Item;
 import model.Pedido;
 import model.Mesa;
+import repository.jdbc.JdbcFuncionarioRepository;
 import repository.jdbc.JdbcMesaRepository;
 import repository.jdbc.JdbcPedidoRepository;
+import service.FuncionarioService;
 import service.PedidoService;
 import service.MesaService;
 
@@ -19,8 +20,9 @@ public class PedidoView {
 	private final Scanner sc = new Scanner(System.in);
 	private final PedidoService pedidoService = new PedidoService(new JdbcPedidoRepository());
     private final MesaService mesaService = new MesaService(new JdbcMesaRepository());
+    private final FuncionarioService funcionarioService = new FuncionarioService(new JdbcFuncionarioRepository());
 
-	public void exibirMenu() {
+    public void exibirMenu() {
 		while (true) {
 			System.out.println("\n=== Gestão de Pedidos ===");
 			System.out.println("1. Cadastrar Pedido");
@@ -45,6 +47,10 @@ public class PedidoView {
 				case 4:
 					excluir();
 					break;
+                //Adicione uma opção para trazer apenas pedidos ativos,
+                // nesse pedido traga o numero da mesa, o total do pedido,
+                // que seria a quantidade de itens pedidos da tabela PedidoItens * o preco_venda presente na tabela item
+                //
 				case 0: {
 					return;
 				}
@@ -61,19 +67,18 @@ public class PedidoView {
 		if (mesaSelecionado == null) return;
 
         Funcionario funcionarioSelecionado = selecionarFuncionario();
-        int idFuncionario = sc.nextInt();
-		sc.nextLine();
+        if (funcionarioSelecionado == null) return;
 
-		System.out.print("Status: ");
-		String status = sc.nextLine();
-
-		Pedido pedido = new Pedido(mesaSelecionado.getId_mesa(), 0, LocalDate.now(), status);
-		pedido.setId_funcionario(idFuncionario);
+		Pedido pedido = new Pedido(mesaSelecionado.getId_mesa(), funcionarioSelecionado.getIdFuncionario(), LocalDate.now(), "Ativo");
 		pedidoService.cadastrarPedido(pedido);
+
+        //adionar metodos para incluir itens em um pedido
 	}
 
 	private void editar() {
-		System.out.println("\n--- Selecione o Pedido para editar ---");
+
+
+        //para editar deve trazer apenas os pedidos com status = "ativo" mas seguindo a mesma lógica do cadastro
 		List<Pedido> pedidos = listar("editar");
 
 		if (pedidos.isEmpty()) {
@@ -137,6 +142,7 @@ public class PedidoView {
 	}
 
 	private void excluir() {
+        //só pode excluir um pedido onde o status seja ativo
 		System.out.println("\n--- Selecione o Pedido para excluir ---");
 		List<Pedido> pedidos = listar("excluir");
 
@@ -231,26 +237,26 @@ public class PedidoView {
 
     private Funcionario selecionarFuncionario() {
         System.out.println("\n--- Selecione o Funcionario ---");
-        List<Mesa> mesas = mesaService.listarMesa();
+        List<Funcionario> funcionarios = funcionarioService.listarFuncionario();
 
-        if (mesas.isEmpty()) {
+        if (funcionarios.isEmpty()) {
             System.out.println("Nenhuma mesa cadastrada.");
             return null;
         }
 
         int cont = 0;
-        for (Mesa m : mesas) {
+        for (Funcionario f : funcionarios) {
             cont++;
-            System.out.println(cont + " - " + m.getNumero());
+            System.out.println(cont + " - " + f.getNome());
         }
         System.out.println("0 - Cancelar");
 
         int escolha = -1;
-        while (escolha < 0 || escolha > mesas.size()) {
+        while (escolha < 0 || escolha > funcionarios.size()) {
             System.out.print("Escolha uma opção: ");
             try {
                 escolha = sc.nextInt();
-                if (escolha < 0 || escolha > mesas.size()) {
+                if (escolha < 0 || escolha > funcionarios.size()) {
                     System.out.println("Opção inválida. Tente novamente!");
                 }
             } catch (InputMismatchException e) {
@@ -264,6 +270,6 @@ public class PedidoView {
             System.out.println("Operação cancelada!");
             return null;
         }
-        return mesas.get(escolha - 1);
+        return funcionarios.get(escolha - 1);
     }
 }

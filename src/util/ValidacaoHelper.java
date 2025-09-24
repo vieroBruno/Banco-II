@@ -65,4 +65,6 @@ public final class ValidacaoHelper {
         }
         return telefone;
     }
+
+    //ADICIONE VALIDAÇÃO PARA NUMEROS INTEIROS, VERIFICAR SE SÃO INTEIROS MESMO, MAIOR QUE -1
 }
