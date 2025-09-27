@@ -82,6 +82,7 @@ public class MesaView {
 			sc.nextLine();
 			if(escolha == 0) {
 				System.out.println("Operação cancelada!");
+                return;
 			}
 
 			Mesa mesaParaEditar = mesas.get(escolha -1);

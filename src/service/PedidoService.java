@@ -2,31 +2,39 @@ package service;
 
 import model.Pedido;
 import repository.PedidoRepository;
-import repository.jdbc.JdbcPedidoRepository;
 
 import java.util.List;
+import java.util.Map;
 
 public class PedidoService {
 
-	private final PedidoRepository repository;
+    private final PedidoRepository repository;
 
-	public PedidoService(PedidoRepository repository) {
-		this.repository = repository;
-	}
+    public PedidoService(PedidoRepository repository) {
+        this.repository = repository;
+    }
 
-	public void cadastrarPedido(Pedido pedido) {
-		repository.save(pedido);
-	}
+    public int cadastrarPedido(Pedido pedido) {
+        return repository.save(pedido);
+    }
 
-	public void editarPedido(Pedido pedido) {
-		repository.update(pedido);
-	}
+    public void editarPedido(Pedido pedido) {
+        repository.update(pedido);
+    }
 
-	public List<Pedido> listarPedido() {
-		return repository.listAll();
-	}
+    public List<Pedido> listarPedido() {
+        return repository.listAll();
+    }
 
-	public void excluirPedido(int id_pedido) {
-		repository.delete(id_pedido);
-	}
+    public List<Pedido> listarPedidosAtivos() {
+        return repository.listAllAtivos();
+    }
+
+    public Map<Integer, Double> listarPedidosAtivosComTotal() {
+        return repository.listarPedidosAtivosComTotal();
+    }
+
+    public void excluirPedido(int id_pedido) {
+        repository.delete(id_pedido);
+    }
 }

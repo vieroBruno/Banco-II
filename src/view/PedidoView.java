@@ -1,201 +1,212 @@
 package view;
 
 import model.Funcionario;
-import model.Pedido;
+import model.Item;
 import model.Mesa;
+import model.Pedido;
+import model.PedidoItem;
 import repository.jdbc.JdbcFuncionarioRepository;
+import repository.jdbc.JdbcItemRepository;
 import repository.jdbc.JdbcMesaRepository;
+import repository.jdbc.JdbcPedidoItemRepository;
 import repository.jdbc.JdbcPedidoRepository;
 import service.FuncionarioService;
-import service.PedidoService;
+import service.ItemService;
 import service.MesaService;
+import service.PedidoItemService;
+import service.PedidoService;
+import util.ValidacaoHelper;
 
 import java.time.LocalDate;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class PedidoView {
 
-	private final Scanner sc = new Scanner(System.in);
-	private final PedidoService pedidoService = new PedidoService(new JdbcPedidoRepository());
+    private final Scanner sc = new Scanner(System.in);
+    private final PedidoService pedidoService = new PedidoService(new JdbcPedidoRepository());
     private final MesaService mesaService = new MesaService(new JdbcMesaRepository());
     private final FuncionarioService funcionarioService = new FuncionarioService(new JdbcFuncionarioRepository());
+    private final ItemService itemService = new ItemService(new JdbcItemRepository());
+    private final PedidoItemService pedidoItemService = new PedidoItemService(new JdbcPedidoItemRepository());
 
     public void exibirMenu() {
-		while (true) {
-			System.out.println("\n=== Gestão de Pedidos ===");
-			System.out.println("1. Cadastrar Pedido");
-			System.out.println("2. Listar Pedidos");
-			System.out.println("3. Editar Pedido");
-			System.out.println("4. Excluir Pedido");
-			System.out.println("0. Voltar");
+        while (true) {
+            System.out.println("\n=== Gestão de Pedidos ===");
+            System.out.println("1. Novo Pedido");
+            System.out.println("2. Listar Todos os Pedidos");
+            System.out.println("3. Listar Pedidos Ativos");
+            System.out.println("4. Editar Status do Pedido");
+            System.out.println("5. Excluir Pedido Ativo");
+            System.out.println("0. Voltar");
 
-			int opcao = sc.nextInt();
-			sc.nextLine();
+            int opcao = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
 
-			switch (opcao) {
-				case 1:
-					cadastrar();
-					break;
-				case 2:
-					listar("listar");
-					break;
-				case 3:
-					editar();
-					break;
-				case 4:
-					excluir();
-					break;
-                //Adicione uma opção para trazer apenas pedidos ativos,
-                // nesse pedido traga o numero da mesa, o total do pedido,
-                // que seria a quantidade de itens pedidos da tabela PedidoItens * o preco_venda presente na tabela item
-                //
-				case 0: {
-					return;
-				}
-				default:
-					System.out.println("Opção inválida!");
-			}
-		}
-	}
+            switch (opcao) {
+                case 1:
+                    cadastrar();
+                    break;
+                case 2:
+                    listarTodos();
+                    break;
+                case 3:
+                    listarAtivosComTotal();
+                    break;
+                case 4:
+                    editar();
+                    break;
+                case 5:
+                    excluir();
+                    break;
+                case 0: {
+                    return;
+                }
+                default:
+                    System.out.println("Opção inválida!");
+            }
+        }
+    }
 
-	private void cadastrar() {
+    private void cadastrar() {
         System.out.println("\n--- Novo Pedido ---");
 
-        Mesa mesaSelecionado = selecionarMesa("para adionar um novo pedido");
-		if (mesaSelecionado == null) return;
+        Mesa mesaSelecionada = selecionarMesa("para adicionar um novo pedido");
+        if (mesaSelecionada == null) return;
 
         Funcionario funcionarioSelecionado = selecionarFuncionario();
         if (funcionarioSelecionado == null) return;
 
-		Pedido pedido = new Pedido(mesaSelecionado.getId_mesa(), funcionarioSelecionado.getIdFuncionario(), LocalDate.now(), "Ativo");
-		pedidoService.cadastrarPedido(pedido);
+        Pedido novoPedido = new Pedido(mesaSelecionada.getId_mesa(), 0, LocalDate.now(), "Ativo");
+        novoPedido.setId_funcionario(funcionarioSelecionado.getIdFuncionario());
+        int idNovoPedido = pedidoService.cadastrarPedido(novoPedido);
 
-        //adionar metodos para incluir itens em um pedido
-	}
+        if (idNovoPedido > 0) {
+            System.out.println("Pedido criado com sucesso.Agora, adicione os itens.");
+            adicionarItensAoPedido(idNovoPedido);
+        } else {
+            System.out.println("Erro: Não foi possível criar o pedido.");
+        }
+    }
 
-	private void editar() {
+    private void adicionarItensAoPedido(int idPedido) {
+        int querAdicionar = 1;
+        while (querAdicionar == 1) {
+            Item itemSelecionado = selecionarItem();
+            if (itemSelecionado == null) {
+                break;
+            }
 
+            int quantidade = ValidacaoHelper.lerInteiro(sc, "Quantidade: ");
 
-        //para editar deve trazer apenas os pedidos com status = "ativo" mas seguindo a mesma lógica do cadastro
-		List<Pedido> pedidos = listar("editar");
+            PedidoItem pedidoItem = new PedidoItem(idPedido, itemSelecionado.getId_item(), quantidade);
+            pedidoItemService.adicionarItemAoPedido(pedidoItem);
+            System.out.println("Item '" + itemSelecionado.getNome() + "' adicionado.");
 
-		if (pedidos.isEmpty()) {
-			return;
-		}
-		System.out.println("0 - Cancelar");
+            System.out.println("\nDeseja adicionar outro item?");
+            System.out.println("1. Sim");
+            System.out.println("2. Não");
+            querAdicionar = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+        }
+    }
 
-		int escolha = -1;
-		while (escolha < 0 || escolha > pedidos.size()) {
-			System.out.println("Escolha uma opção:");
-			try {
-				escolha = sc.nextInt();
-				if (escolha < 0 || escolha > pedidos.size()) {
-					System.out.println("Opção inválida. Tente novamente!");
-				}
-			} catch (InputMismatchException e) {
-				System.out.println("Entrada inválida. Por favor, digite um número.");
-				sc.next();
-			}
-		}
-		sc.nextLine();
-		if (escolha == 0) {
-			System.out.println("Operação cancelada!");
-			return;
-		}
+    private void editar() {
+        System.out.println("\n--- Selecione o Pedido para Editar o Status ---");
+        List<Pedido> pedidosAtivos = pedidoService.listarPedidosAtivos();
 
-		Pedido pedidoParaEditar = pedidos.get(escolha - 1);
+        if (pedidosAtivos.isEmpty()) {
+            System.out.println("Nenhum pedido ativo para editar.");
+            return;
+        }
 
-		System.out.println("Editando dados do Pedido ID: " + pedidoParaEditar.getId_pedido());
+        int cont = 0;
+        for (Pedido p : pedidosAtivos) {
+            cont++;
+            System.out.printf("%d - Pedido ID: %d, Mesa ID: %d, Status: %s\n", cont, p.getId_pedido(), p.getId_mesa(), p.getStatus());
+        }
+        System.out.println("0 - Cancelar");
 
-		System.out.print("Novo ID da Mesa: ");
-		int idMesa = sc.nextInt();
+        int escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ") -1;
 
-		System.out.print("Novo ID do Funcionário: ");
-		int idFuncionario = sc.nextInt();
-		sc.nextLine();
+        if (escolha < 0 || escolha >= pedidosAtivos.size()) {
+            System.out.println("Operação cancelada ou opção inválida.");
+            return;
+        }
 
-		System.out.print("Novo Status: ");
-		String status = sc.nextLine();
+        Pedido pedidoParaEditar = pedidosAtivos.get(escolha);
 
-		Pedido pedido = new Pedido(idMesa, pedidoParaEditar.getId_pedido(), pedidoParaEditar.getData_pedido(), status);
-		pedido.setId_funcionario(idFuncionario);
-		pedidoService.editarPedido(pedido);
-	}
+        System.out.print("Novo Status (ex: Finalizado, Cancelado): ");
+        String novoStatus = sc.nextLine();
 
-	private List<Pedido> listar(String metodo) {
-		List<Pedido> pedidos = pedidoService.listarPedido();
+        pedidoParaEditar.setStatus(novoStatus);
+        pedidoService.editarPedido(pedidoParaEditar);
+    }
 
-		if (pedidos.isEmpty()) {
-			System.out.println("Nenhum pedido disponível para " + metodo);
-			return pedidos;
-		}
+    private void listarTodos() {
+        List<Pedido> pedidos = pedidoService.listarPedido();
 
-		int cont = 0;
-		for (Pedido p : pedidos) {
-			cont++;
-			System.out.println("Pedido {" + cont + "} : id_pedido='" + p.getId_pedido() + '\'' + ", id_mesa='" + p.getId_mesa() + '\'' + ", id_funcionario='" + p.getId_funcionario() + '\'' + ", data_pedido='" + p.getData_pedido() + '\'' + ", status='" + p.getStatus() + '\'');
-		}
+        if (pedidos.isEmpty()) {
+            System.out.println("Nenhum pedido encontrado.");
+            return;
+        }
+        System.out.println("\n--- Todos os Pedidos ---");
+        for (Pedido p : pedidos) {
+            System.out.printf("ID: %d, Mesa ID: %d, Func. ID: %d, Data: %s, Status: %s\n",
+                    p.getId_pedido(), p.getId_mesa(), p.getId_funcionario(), p.getData_pedido(), p.getStatus());
+        }
+    }
 
-		return pedidos;
-	}
+    private void listarAtivosComTotal() {
+        Map<Integer, Double> totais = pedidoService.listarPedidosAtivosComTotal();
+        if (totais.isEmpty()) {
+            System.out.println("Nenhum pedido ativo no momento.");
+            return;
+        }
+        System.out.println("\n--- Pedidos Ativos e Totais ---");
+        for (Map.Entry<Integer, Double> entry : totais.entrySet()) {
+            System.out.printf("Mesa Número: %d - Total do Pedido: R$ %.2f\n", entry.getKey(), entry.getValue());
+        }
+    }
 
-	private void excluir() {
-        //só pode excluir um pedido onde o status seja ativo
-		System.out.println("\n--- Selecione o Pedido para excluir ---");
-		List<Pedido> pedidos = listar("excluir");
+    private void excluir() {
+        System.out.println("\n--- Selecione o Pedido Ativo para Excluir ---");
+        List<Pedido> pedidosAtivos = pedidoService.listarPedidosAtivos();
 
-		if (pedidos.isEmpty()) {
-			return;
-		}
+        if (pedidosAtivos.isEmpty()) {
+            System.out.println("Nenhum pedido ativo para excluir.");
+            return;
+        }
 
-		System.out.println("0 - Cancelar");
+        int cont = 0;
+        for (Pedido p : pedidosAtivos) {
+            cont++;
+            System.out.printf("%d - Pedido ID: %d, Mesa ID: %d\n", cont, p.getId_pedido(), p.getId_mesa());
+        }
+        
 
-		int escolha = -1;
-		while (escolha < 0 || escolha > pedidos.size()) {
-			System.out.println("Escolha uma opção:");
-			try {
-				escolha = sc.nextInt();
-				if (escolha < 0 || escolha > pedidos.size()) {
-					System.out.println("Opção inválida. Tente novamente!");
-					sc.next();
-				}
-			} catch (InputMismatchException e) {
-				System.out.println("Entrada inválida. Por favor, digite um número.");
-				sc.next();
-			}
-		}
-		sc.nextLine();
-		if (escolha == 0) {
-			System.out.println("Operação cancelada!");
-			return;
-		}
-		Pedido pedidoParaExcluir = pedidos.get(escolha - 1);
+        System.out.println("0 - Cancelar");
 
-		int escolhafinal = -1;
-		while (escolhafinal != 1 && escolhafinal != 2) {
-			System.out.println("Deseja realmente excluir esse pedido? : " + pedidoParaExcluir.getId_pedido());
-			System.out.println("1. Sim");
-			System.out.println("2. Não");
-			try {
-				escolhafinal = sc.nextInt();
-				if (escolhafinal != 1 && escolhafinal != 2) {
-					System.out.println("Opção inválida. Tente novamente!");
-					sc.next();
-				}
-			} catch (InputMismatchException e) {
-				System.out.println("Entrada inválida. Por favor, digite um número.");
-				sc.next();
-			}
-		}
-		sc.nextLine();
-		if (escolhafinal == 2) {
-			System.out.println("Operação cancelada!");
-			return;
-		}
-		pedidoService.excluirPedido(pedidoParaExcluir.getId_pedido());
-	}
+        int escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ") - 1;
+
+        if (escolha < 0 || escolha >= pedidosAtivos.size()) {
+            System.out.println("Operação cancelada ou opção inválida.");
+            return;
+        }
+
+        Pedido pedidoParaExcluir = pedidosAtivos.get(escolha);
+
+        System.out.println("Deseja realmente excluir o pedido " + pedidoParaExcluir.getId_pedido() + "?");
+        System.out.println("1. Sim");
+        System.out.println("2. Não");
+        int escolhafinal = ValidacaoHelper.lerInteiro(sc, "Confirme: ");
+
+        if (escolhafinal == 1) {
+            pedidoService.excluirPedido(pedidoParaExcluir.getId_pedido());
+        } else {
+            System.out.println("Operação cancelada!");
+        }
+    }
 
     private Mesa selecionarMesa(String acao) {
         System.out.println("\n--- Selecione a Mesa " + acao + " ---");
@@ -209,30 +220,17 @@ public class PedidoView {
         int cont = 0;
         for (Mesa m : mesas) {
             cont++;
-            System.out.println(cont + " - " + m.getNumero());
+            System.out.println(cont + " - Mesa Número: " + m.getNumero());
         }
         System.out.println("0 - Cancelar");
 
-        int escolha = -1;
-        while (escolha < 0 || escolha > mesas.size()) {
-            System.out.print("Escolha uma opção: ");
-            try {
-                escolha = sc.nextInt();
-                if (escolha < 0 || escolha > mesas.size()) {
-                    System.out.println("Opção inválida. Tente novamente!");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Entrada inválida. Por favor, digite um número.");
-                sc.next();
-            }
-        }
-        sc.nextLine();
+        int escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ") - 1;
 
-        if (escolha == 0) {
-            System.out.println("Operação cancelada!");
+        if (escolha < 0 || escolha >= mesas.size()) {
+            System.out.println("Operação cancelada ou opção inválida.");
             return null;
         }
-        return mesas.get(escolha - 1);
+        return mesas.get(escolha);
     }
 
     private Funcionario selecionarFuncionario() {
@@ -240,7 +238,7 @@ public class PedidoView {
         List<Funcionario> funcionarios = funcionarioService.listarFuncionario();
 
         if (funcionarios.isEmpty()) {
-            System.out.println("Nenhuma mesa cadastrada.");
+            System.out.println("Nenhum funcionário cadastrado.");
             return null;
         }
 
@@ -251,25 +249,37 @@ public class PedidoView {
         }
         System.out.println("0 - Cancelar");
 
-        int escolha = -1;
-        while (escolha < 0 || escolha > funcionarios.size()) {
-            System.out.print("Escolha uma opção: ");
-            try {
-                escolha = sc.nextInt();
-                if (escolha < 0 || escolha > funcionarios.size()) {
-                    System.out.println("Opção inválida. Tente novamente!");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Entrada inválida. Por favor, digite um número.");
-                sc.next();
-            }
-        }
-        sc.nextLine();
+        int escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ") - 1;
 
-        if (escolha == 0) {
-            System.out.println("Operação cancelada!");
+        if (escolha < 0 || escolha >= funcionarios.size()) {
+            System.out.println("Operação cancelada ou opção inválida.");
             return null;
         }
-        return funcionarios.get(escolha - 1);
+        return funcionarios.get(escolha);
+    }
+
+    private Item selecionarItem() {
+        System.out.println("\n--- Selecione o Item ---");
+        List<Item> items = itemService.listarItem();
+
+        if (items.isEmpty()) {
+            System.out.println("Nenhum item cadastrado.");
+            return null;
+        }
+
+        int cont = 0;
+        for (Item i : items) {
+            cont++;
+            System.out.printf("%d - %s (R$ %.2f)\n", cont, i.getNome(), i.getPreco_venda());
+        }
+        System.out.println("0 - Cancelar");
+
+        int escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ") - 1;
+
+        if (escolha < 0 || escolha >= items.size()) {
+            System.out.println("Operação cancelada ou opção inválida.");
+            return null;
+        }
+        return items.get(escolha);
     }
 }

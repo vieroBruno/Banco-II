@@ -66,5 +66,25 @@ public final class ValidacaoHelper {
         return telefone;
     }
 
-    //ADICIONE VALIDAÇÃO PARA NUMEROS INTEIROS, VERIFICAR SE SÃO INTEIROS MESMO, MAIOR QUE -1
+    public static int lerInteiro(Scanner sc, String mensagem) {
+        int valor = -1;
+        boolean valido = false;
+        while (!valido) {
+            System.out.print(mensagem);
+            try {
+                valor = sc.nextInt();
+                if (valor >= 0) {
+                    valido = true;
+                } else {
+                    System.out.println("Erro: Por favor, digite um número positivo.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Erro: Por favor, digite um número inteiro válido.");
+                sc.next(); // Limpa o buffer do scanner para evitar loop infinito
+            }
+        }
+        sc.nextLine(); // Limpa a quebra de linha restante do buffer
+        return valor;
+    }
+
 }
