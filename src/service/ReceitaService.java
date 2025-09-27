@@ -23,7 +23,7 @@ public class ReceitaService {
 	}
 
 	public List<Produto> listarReceita(int id_item) {
-		return repository.listarIngredientesItem(id_item);
+		return repository.listarProdutosItem(id_item);
 	}
 
 	public void excluirReceita(int id_receita, int id_produto) {

@@ -159,7 +159,8 @@ public class FuncionarioView {
 
         int escolhafinal = -1;
         while(escolhafinal != 1 && escolhafinal != 2) {
-            System.out.println("Deseja realmente excluir esse funcionário? : " + funcionarioParaExcluir.getNome());
+            System.out.println("Deseja realmente excluir esse funcionário? : " + funcionarioParaExcluir.getNome() +" Todas as informações relacionadas " +
+            "a esse funcionário serão excluidas juntos");
             System.out.println("1. Sim");
             System.out.println("2. Não");
             try {

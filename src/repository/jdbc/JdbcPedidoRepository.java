@@ -75,8 +75,28 @@ public class JdbcPedidoRepository implements PedidoRepository {
 
     @Override
     public Pedido findById(int id_pedido) {
-        // Implementação futura
-        return null;
+        String query = "SELECT id_pedido, fk_mesas_id_mesa, fk_funcionarios_id_funcionario, data_pedido, status FROM pedidos WHERE id_pedido = ?";
+        Pedido pedido = null;
+
+        try (Connection con = new Conexao().getConnection();
+             PreparedStatement st = con.prepareStatement(query)) {
+
+            st.setInt(1, id_pedido);
+            try (ResultSet result = st.executeQuery()) {
+                if (result.next()) {
+                    pedido = new Pedido(
+                            result.getInt("fk_mesas_id_mesa"),
+                            result.getInt("id_pedido"),
+                            result.getTimestamp("data_pedido").toLocalDateTime().toLocalDate(),
+                            result.getString("status")
+                    );
+                    pedido.setId_funcionario(result.getInt("fk_funcionarios_id_funcionario"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar pedido por ID", e);
+        }
+        return pedido;
     }
 
     @Override
@@ -151,5 +171,22 @@ public class JdbcPedidoRepository implements PedidoRepository {
             throw new RuntimeException("Erro ao listar totais de pedidos ativos", e);
         }
         return totaisPorMesa;
+    }
+
+    @Override
+    public boolean existePedidoAtivoNaMesa(int id_mesa) {
+        String query = "SELECT COUNT(*) FROM pedidos WHERE fk_mesas_id_mesa = ? AND status = 'Ativo'";
+        try (Connection con = new Conexao().getConnection();
+             PreparedStatement st = con.prepareStatement(query)) {
+            st.setInt(1, id_mesa);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao verificar pedido ativo na mesa", e);
+        }
+        return false;
     }
 }

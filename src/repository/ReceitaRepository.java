@@ -11,5 +11,5 @@ public interface ReceitaRepository {
 	void update(Receita receita);
 	void delete(int id_receita, int id_produto);
 	Receita findById(int id_receita);
-	List<Produto> listarIngredientesItem(int id_item);
+	List<Produto> listarProdutosItem(int id_item);
 }

@@ -3,7 +3,6 @@ package service;
 import model.Funcionario;
 import repository.jdbc.JdbcFuncionarioRepository;
 
-import java.util.HashSet;
 import java.util.List;
 
 
@@ -28,6 +27,10 @@ public class FuncionarioService {
 
     public void excluirFuncionario(int id_funcionario) {
          repository.delete(id_funcionario);
+    }
+
+    public Funcionario findById(int id_funcionario) {
+        return repository.findById(id_funcionario);
     }
 
 }

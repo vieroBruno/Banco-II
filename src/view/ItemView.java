@@ -159,7 +159,8 @@ public class ItemView {
 
 		int escolhafinal = -1;
 		while (escolhafinal != 1 && escolhafinal != 2) {
-			System.out.println("Deseja realmente excluir esse item? : " + itemParaExcluir.getNome());
+			System.out.println("Deseja realmente excluir esse item? : " + itemParaExcluir.getNome()+ " Todas as informações relacionadas " +
+            "com esse Item serão excluidas");
 			System.out.println("1. Sim");
 			System.out.println("2. Não");
 			try {

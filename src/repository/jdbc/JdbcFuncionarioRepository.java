@@ -74,7 +74,28 @@ public class JdbcFuncionarioRepository implements FuncionarioRepository {
     }
     @Override
     public Funcionario findById(int id_funcionario) {
-        return null;
+        String query = "SELECT id_funcionario, nome, cargo, salario, telefone FROM FUNCIONARIOS WHERE id_funcionario = ?";
+        Funcionario funcionario = null;
+
+        try (Connection con = new Conexao().getConnection();
+             PreparedStatement st = con.prepareStatement(query)) {
+
+            st.setInt(1, id_funcionario);
+            try (ResultSet result = st.executeQuery()) {
+                if (result.next()) {
+                    funcionario = new Funcionario(
+                            result.getInt("id_funcionario"),
+                            result.getString("nome"),
+                            result.getString("cargo"),
+                            result.getDouble("salario"),
+                            result.getString("telefone")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar funcionário por ID", e);
+        }
+        return funcionario;
     }
 
     @Override
@@ -88,11 +109,11 @@ public class JdbcFuncionarioRepository implements FuncionarioRepository {
             ResultSet result = st.executeQuery(query);
             while(result.next()) {
                 funcionarios.add(new Funcionario(
-                    result.getInt(1),
-                    result.getString(2),
-                    result.getString(3),
-                    result.getDouble(4),
-                    result.getString(5)
+                        result.getInt(1),
+                        result.getString(2),
+                        result.getString(3),
+                        result.getDouble(4),
+                        result.getString(5)
                 ));
             }
         } catch (SQLException e) {
@@ -102,4 +123,3 @@ public class JdbcFuncionarioRepository implements FuncionarioRepository {
     }
 
 }
-

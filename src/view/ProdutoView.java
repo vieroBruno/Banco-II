@@ -158,7 +158,8 @@ public class ProdutoView {
 
         int escolhafinal = -1;
         while (escolhafinal != 1 && escolhafinal != 2) {
-            System.out.println("Deseja realmente excluir esse produto? : " + produtoParaExcluir.getNome());
+            System.out.println("Deseja realmente excluir esse produto? : " + produtoParaExcluir.getNome()
+            +"Todas as informações relaciondas com esse Produto serão excluidas");
             System.out.println("1. Sim");
             System.out.println("2. Não");
             try {

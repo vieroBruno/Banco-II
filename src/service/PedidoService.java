@@ -15,6 +15,10 @@ public class PedidoService {
     }
 
     public int cadastrarPedido(Pedido pedido) {
+        if (repository.existePedidoAtivoNaMesa(pedido.getId_mesa())) {
+            System.out.println("Erro: Esta mesa já possui um pedido ativo.");
+            return -1;
+        }
         return repository.save(pedido);
     }
 
@@ -36,5 +40,9 @@ public class PedidoService {
 
     public void excluirPedido(int id_pedido) {
         repository.delete(id_pedido);
+    }
+
+    public Pedido findById(int id_pedido) {
+        return repository.findById(id_pedido);
     }
 }

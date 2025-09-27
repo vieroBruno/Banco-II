@@ -147,7 +147,8 @@ public class MesaView {
 
             int escolhafinal = -1;
             while(escolhafinal != 1 && escolhafinal != 2) {
-                System.out.println("Deseja realmente excluir essa mesa? : " + mesaParaExcluir.getNumero());
+                System.out.println("Deseja realmente excluir essa mesa? : " + mesaParaExcluir.getNumero() +
+                " Todas as informações relaciondas com essa mesa serão excluidas");
                 System.out.println("1. Sim");
                 System.out.println("2. Não");
                 try {
@@ -162,7 +163,7 @@ public class MesaView {
                 }
             }
             sc.nextLine();
-            if (escolha == 2) {
+            if (escolhafinal == 2) {
                 System.out.println("Operação cancelada!");
                 return;
             }

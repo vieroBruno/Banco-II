@@ -14,4 +14,5 @@ public interface PedidoRepository {
     List<Pedido> listAll();
     List<Pedido> listAllAtivos();
     Map<Integer, Double> listarPedidosAtivosComTotal();
+    boolean existePedidoAtivoNaMesa(int id_mesa);
 }

@@ -24,10 +24,10 @@ public class ReceitaView {
     public void exibirMenu() {
         while (true) {
             System.out.println("\n=== Gestão de Receitas ===");
-            System.out.println("1. Adicionar Ingrediente a um Item");
-            System.out.println("2. Listar Ingredientes de um Item");
-            System.out.println("3. Editar Quantidade de um Ingrediente");
-            System.out.println("4. Excluir Ingrediente de um Item");
+            System.out.println("1. Inserir produtos a uma Receita");
+            System.out.println("2. Listar produtos de uma Receita");
+            System.out.println("3. Editar produtos de uma Receita");
+            System.out.println("4. Excluir produtos de uma Receita");
             System.out.println("0. Voltar");
 
             int opcao;
@@ -59,9 +59,9 @@ public class ReceitaView {
     }
 
     private void cadastrar() {
-        System.out.println("\n--- Adicionar Ingrediente a uma Receita ---");
+        System.out.println("\n--- Adicionar Produto a uma Receita ---");
 
-        Item itemSelecionado = selecionarItem("para adicionar um ingrediente");
+        Item itemSelecionado = selecionarItem("para adicionar um produto");
         if (itemSelecionado == null) return;
 
         Produto produtoSelecionado = selecionarProduto();
@@ -77,39 +77,39 @@ public class ReceitaView {
     }
 
     private void editar() {
-        System.out.println("\n--- Editar Quantidade de um Ingrediente ---");
+        System.out.println("\n--- Editar receita ---");
 
         Item itemSelecionado = selecionarItem("para editar a receita");
         if (itemSelecionado == null) return;
 
-        Produto ingredienteParaEditar = selecionarIngrediente(itemSelecionado);
-        if (ingredienteParaEditar == null) return;
+        Produto produtoParaEditar = selecionarProduto(itemSelecionado);
+        if (produtoParaEditar == null) return;
 
-        System.out.print("Nova Quantidade (em " + ingredienteParaEditar.getUnidade_medida() + "): ");
+        System.out.print("Nova Quantidade (em " + produtoParaEditar.getUnidade_medida() + "): ");
         double novaQuantidade = sc.nextDouble();
         sc.nextLine();
 
-        Receita receitaAtualizada = new Receita(itemSelecionado.getId_item(), ingredienteParaEditar.getId_produto(), novaQuantidade);
+        Receita receitaAtualizada = new Receita(itemSelecionado.getId_item(), produtoParaEditar.getId_produto(), novaQuantidade);
         receitaService.editarReceita(receitaAtualizada);
     }
 
     private void excluir() {
-        System.out.println("\n--- Excluir Ingrediente de uma Receita ---");
+        System.out.println("\n--- Excluir Receita ---");
 
-        Item itemSelecionado = selecionarItem("para excluir um ingrediente");
+        Item itemSelecionado = selecionarItem("para excluir um produto");
         if (itemSelecionado == null) return;
 
-        Produto ingredienteParaExcluir = selecionarIngrediente(itemSelecionado);
-        if (ingredienteParaExcluir == null) return;
+        Produto produtoParaExcluir = selecionarProduto(itemSelecionado);
+        if (produtoParaExcluir == null) return;
 
-        System.out.println("Deseja realmente remover '" + ingredienteParaExcluir.getNome() + "' da receita de '" + itemSelecionado.getNome() + "'?");
+        System.out.println("Deseja realmente remover '" + produtoParaExcluir.getNome() + "' da receita de '" + itemSelecionado.getNome() + "'?");
         System.out.println("1. Sim");
         System.out.println("2. Não");
         int confirmacao = sc.nextInt();
         sc.nextLine();
 
         if (confirmacao == 1) {
-            receitaService.excluirReceita(itemSelecionado.getId_item(), ingredienteParaExcluir.getId_produto());
+            receitaService.excluirReceita(itemSelecionado.getId_item(), produtoParaExcluir.getId_produto());
         } else {
             System.out.println("Operação cancelada.");
         }
@@ -120,16 +120,16 @@ public class ReceitaView {
         if (itemSelecionado == null) return;
 
         System.out.println("\n--- Receita para o item: " + itemSelecionado.getNome() + " ---");
-        List<Produto> ingredientes = receitaService.listarReceita(itemSelecionado.getId_item());
+        List<Produto> produtos = receitaService.listarReceita(itemSelecionado.getId_item());
 
-        if (ingredientes.isEmpty()) {
-            System.out.println("Este item ainda não possui ingredientes cadastrados.");
+        if (produtos.isEmpty()) {
+            System.out.println("Este item ainda não possui produtos cadastrados.");
         } else {
-            for (Produto ingrediente : ingredientes) {
+            for (Produto produto : produtos) {
                 System.out.printf("- %s: %.2f %s\n",
-                        ingrediente.getNome(),
-                        (double) ingrediente.getQuantidade(),
-                        ingrediente.getUnidade_medida());
+                        produto.getNome(),
+                        (double) produto.getQuantidade(),
+                        produto.getUnidade_medida());
             }
         }
     }
@@ -172,24 +172,24 @@ public class ReceitaView {
         return items.get(escolha - 1);
     }
 
-    private Produto selecionarIngrediente(Item item) {
-        System.out.println("\n--- Selecione o Ingrediente ---");
-        List<Produto> ingredientes = receitaService.listarReceita(item.getId_item());
+    private Produto selecionarProduto(Item item) {
+        System.out.println("\n--- Selecione o Produto ---");
+        List<Produto> produtos = receitaService.listarReceita(item.getId_item());
 
-        if (ingredientes.isEmpty()) {
-            System.out.println("Este item não possui ingredientes.");
+        if (produtos.isEmpty()) {
+            System.out.println("Este item não possui produtos.");
             return null;
         }
 
         int cont = 0;
-        for (Produto p : ingredientes) {
+        for (Produto p : produtos) {
             cont++;
             System.out.printf("%d - %s (%.2f %s)\n", cont, p.getNome(), (double) p.getQuantidade(), p.getUnidade_medida());
         }
         System.out.println("0 - Cancelar");
 
         int escolha = -1;
-        while (escolha < 0 || escolha > ingredientes.size()) {
+        while (escolha < 0 || escolha > produtos.size()) {
             System.out.print("Escolha uma opção: ");
             try {
                 escolha = sc.nextInt();
@@ -204,11 +204,11 @@ public class ReceitaView {
             System.out.println("Operação cancelada.");
             return null;
         }
-        return ingredientes.get(escolha - 1);
+        return produtos.get(escolha - 1);
     }
 
     private Produto selecionarProduto() {
-        System.out.println("\n--- Selecione o Produto (Ingrediente) para Adicionar ---");
+        System.out.println("\n--- Selecione o Produto (Produto) para Adicionar ---");
         List<Produto> produtos = produtoService.listarProduto();
 
         if (produtos.isEmpty()) {

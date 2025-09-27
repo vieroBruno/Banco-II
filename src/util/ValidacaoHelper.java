@@ -1,5 +1,8 @@
 package util;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -80,11 +83,25 @@ public final class ValidacaoHelper {
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Erro: Por favor, digite um número inteiro válido.");
-                sc.next(); // Limpa o buffer do scanner para evitar loop infinito
+                sc.next();
             }
         }
-        sc.nextLine(); // Limpa a quebra de linha restante do buffer
+        sc.nextLine();
         return valor;
     }
 
+    public static LocalDate lerData(Scanner sc, String mensagem) {
+        LocalDate data = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        while (data == null) {
+            System.out.print(mensagem);
+            String input = sc.nextLine();
+            try {
+                data = LocalDate.parse(input, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Erro: Formato de data inválido. Use o formato DD/MM/YYYY.");
+            }
+        }
+        return data;
+    }
 }
