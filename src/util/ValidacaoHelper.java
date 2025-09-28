@@ -3,15 +3,31 @@ package util;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public final class ValidacaoHelper {
 
     private ValidacaoHelper() {}
 
-    public static boolean isStringValida(String texto) {
-        return texto != null && !texto.trim().isEmpty();
+    public static String isStringValida(Scanner sc, String mensagem) {
+        boolean valido = false;
+        System.out.print(mensagem);
+        String texto = sc.nextLine();
+
+        while(!valido) {
+            if (texto != null && !texto.trim().isEmpty()) {
+                valido = true;
+            } else {
+                System.out.println("Esse campo não pode ser nulo. Tente Novamente");
+                System.out.print(mensagem);
+                texto = sc.nextLine();
+            }
+
+        }
+        return texto;
     }
 
     public static double lerDouble(Scanner sc, String mensagem) {
@@ -103,5 +119,25 @@ public final class ValidacaoHelper {
             }
         }
         return data;
+    }
+
+    public static String lerUnidadeMedidaValida(Scanner sc, String mensagem) {
+        String unidade = "";
+        boolean valido = false;
+        List<String> unidadesValidas = Arrays.asList("Quilogramas", "Litros", "Mililitros", "Gramas");
+
+        while (!valido) {
+            System.out.print(mensagem);
+            unidade = sc.nextLine();
+            String unidadeFormatada = unidade.substring(0, 1).toUpperCase() + unidade.substring(1).toLowerCase();
+
+            if (unidadesValidas.contains(unidadeFormatada)) {
+                unidade = unidadeFormatada;
+                valido = true;
+            } else {
+                System.out.println("Erro: Unidade de medida inválida. Use: Quilogramas, Litros, Mililitros ou Gramas.");
+            }
+        }
+        return unidade;
     }
 }

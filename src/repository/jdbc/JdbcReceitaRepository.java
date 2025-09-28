@@ -97,4 +97,22 @@ public class JdbcReceitaRepository implements ReceitaRepository {
         }
         return produtos;
     }
+
+    @Override
+    public boolean produtoJaExisteNaReceita(int id_item, int id_produto) {
+        String query = "SELECT COUNT(*) FROM receitas WHERE fk_item_id_items = ? AND fk_produtos_id_produto = ?";
+        try (Connection con = new Conexao().getConnection();
+             PreparedStatement st = con.prepareStatement(query)) {
+            st.setInt(1, id_item);
+            st.setInt(2, id_produto);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao verificar se produto existe na receita", e);
+        }
+        return false;
+    }
 }

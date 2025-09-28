@@ -32,4 +32,8 @@ public class MesaService {
     public Mesa findById(int id_mesa) {
         return repository.findById(id_mesa);
     }
+
+    public Mesa findByNumero(int numero) {
+        return repository.findByNumero(numero);
+    }
 }

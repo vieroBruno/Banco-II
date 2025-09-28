@@ -11,4 +11,6 @@ public interface MesaRepository {
     void delete(int id_mesa);
     Mesa findById(int id_mesa);
     List<Mesa> listAll();
+    Mesa findByNumero(int numero);
+
 }

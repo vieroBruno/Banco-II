@@ -1,24 +1,11 @@
 package view;
 
-import model.Funcionario;
-import model.Item;
-import model.Mesa;
-import model.Pedido;
-import model.PedidoItem;
-import repository.jdbc.JdbcFuncionarioRepository;
-import repository.jdbc.JdbcItemRepository;
-import repository.jdbc.JdbcMesaRepository;
-import repository.jdbc.JdbcPedidoItemRepository;
-import repository.jdbc.JdbcPedidoRepository;
-import service.FuncionarioService;
-import service.ItemService;
-import service.MesaService;
-import service.PedidoItemService;
-import service.PedidoService;
+import model.*;
+import repository.jdbc.*;
+import service.*;
 import util.ValidacaoHelper;
 
 import java.time.LocalDate;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -33,6 +20,8 @@ public class PedidoView {
     private final FuncionarioService funcionarioService = new FuncionarioService(new JdbcFuncionarioRepository());
     private final ItemService itemService = new ItemService(new JdbcItemRepository());
     private final PedidoItemService pedidoItemService = new PedidoItemService(new JdbcPedidoItemRepository());
+    private final ProdutoService produtoService = new ProdutoService(new JdbcProdutoRepository());
+    private final ReceitaService receitaService = new ReceitaService(new JdbcReceitaRepository());
 
     public void exibirMenu() {
         while (true) {
@@ -88,29 +77,9 @@ public class PedidoView {
             System.out.println("Pedido criado com sucesso.Agora, adicione os itens.");
             adicionarItensAoPedido(idNovoPedido);
         } else if (idNovoPedido == -1) {
+            System.out.println("Erro: Esta mesa já possui um pedido ativo.");
         } else {
             System.out.println("Erro: Não foi possível criar o pedido.");
-        }
-    }
-
-    private void adicionarItensAoPedido(int idPedido) {
-        int querAdicionar = 1;
-        while (querAdicionar == 1) {
-            Item itemSelecionado = selecionarItem();
-            if (itemSelecionado == null) {
-                break;
-            }
-
-            int quantidade = ValidacaoHelper.lerInteiro(sc, "Quantidade: ");
-
-            PedidoItem pedidoItem = new PedidoItem(idPedido, itemSelecionado.getId_item(), quantidade);
-            pedidoItemService.adicionarItemAoPedido(pedidoItem);
-            System.out.println("Item '" + itemSelecionado.getNome() + "' adicionado.");
-
-            System.out.println("\nDeseja adicionar outro item?");
-            System.out.println("1. Sim");
-            System.out.println("2. Não");
-            querAdicionar = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
         }
     }
 
@@ -132,25 +101,32 @@ public class PedidoView {
         }
         System.out.println("0 - Cancelar");
 
-        int escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ") - 1;
+        int escolha;
+        do {
+            escolha = ValidacaoHelper.lerInteiro(sc, "Confirme: ");
+            if (escolha < 0 || escolha > pedidos.size() ){
+                System.out.println("Opção inválida tente novamente");
+            }
+        } while (escolha < 0 || escolha > pedidos.size() );
 
-        if (escolha < 0 || escolha >= pedidos.size()) {
-            System.out.println("Operação cancelada ou opção inválida.");
-            return;
-        }
-
-        Pedido pedidoParaEditar = pedidos.get(escolha);
+        Pedido pedidoParaEditar = pedidos.get(escolha -1);
 
         System.out.println("\nEditando Pedido da Mesa " + mesaService.findById(pedidoParaEditar.getId_mesa()).getNumero());
 
-        Mesa novaMesa = selecionarMesa("para qual deseja mover o pedido");
-        if(novaMesa != null) {
-            pedidoParaEditar.setId_mesa(novaMesa.getId_mesa());
+        System.out.println("Deseja alterar a mesa do pedido? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            Mesa novaMesa = selecionarMesa("para qual deseja mover o pedido");
+            if(novaMesa != null) {
+                pedidoParaEditar.setId_mesa(novaMesa.getId_mesa());
+            }
         }
 
-        Funcionario novoFuncionario = selecionarFuncionario();
-        if(novoFuncionario != null) {
-            pedidoParaEditar.setId_funcionario(novoFuncionario.getIdFuncionario());
+        System.out.println("Deseja alterar o funcionário do pedido? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            Funcionario novoFuncionario = selecionarFuncionario();
+            if(novoFuncionario != null) {
+                pedidoParaEditar.setId_funcionario(novoFuncionario.getIdFuncionario());
+            }
         }
 
         System.out.println("Deseja alterar a data do pedido? (S/N)");
@@ -158,12 +134,13 @@ public class PedidoView {
             pedidoParaEditar.setData_pedido(ValidacaoHelper.lerData(sc, "Nova data do pedido (DD/MM/YYYY): "));
         }
 
-        System.out.print("Novo Status (ex: Finalizado, Cancelado, Ativo): ");
-        String novoStatus = sc.nextLine();
-        pedidoParaEditar.setStatus(novoStatus);
+        System.out.println("Deseja alterar o status do pedido? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            System.out.print("Novo Status (ex: Pago, Cancelado, Ativo): ");
+            pedidoParaEditar.setStatus(sc.nextLine());
+        }
 
         pedidoService.editarPedido(pedidoParaEditar);
-        System.out.println("Pedido editado com sucesso!");
     }
 
 
@@ -178,8 +155,10 @@ public class PedidoView {
         for (Pedido p : pedidos) {
             Mesa m = mesaService.findById(p.getId_mesa());
             Funcionario f = funcionarioService.findById(p.getId_funcionario());
-            System.out.printf("Mesa: %d, Garçom: %s, Data: %s, Status: %s\n",
-                    m.getNumero(), f.getNome(), p.getData_pedido(), p.getStatus());
+            if (m != null && f != null) {
+                System.out.printf("Mesa: %d, Garçom: %s, Data: %s, Status: %s\n",
+                        m.getNumero(), f.getNome(), p.getData_pedido(), p.getStatus());
+            }
         }
     }
 
@@ -228,27 +207,37 @@ public class PedidoView {
             cont++;
             Mesa m = mesaService.findById(p.getId_mesa());
             Funcionario f = funcionarioService.findById(p.getId_funcionario());
-            System.out.printf("%d - Mesa: %d, Garçom: %s, Data: %s, Status: %s\n", cont, m.getNumero(), f.getNome(), p.getData_pedido(), p.getStatus());
+            if (m != null && f != null) {
+                System.out.printf("%d - Mesa: %d, Garçom: %s, Data: %s, Status: %s\n", cont, m.getNumero(), f.getNome(), p.getData_pedido(), p.getStatus());
+            }
         }
         System.out.println("0 - Cancelar");
 
-        int escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ") - 1;
+        int escolha;
+        do {
+            escolha = ValidacaoHelper.lerInteiro(sc, "Confirme: ");
+            if (escolha < 0 || escolha > pedidos.size() ){
+                System.out.println("Opção inválida tente novamente");
+            }
+        } while (escolha < 0 || escolha > pedidos.size() );
 
-        if (escolha < 0 || escolha >= pedidos.size()) {
-            System.out.println("Operação cancelada ou opção inválida.");
-            return;
-        }
 
-        Pedido pedidoParaExcluir = pedidos.get(escolha);
+        Pedido pedidoParaExcluir = pedidos.get(escolha -1);
 
         System.out.println("\nTem certeza que deseja deletar esse pedido? Todas as informações relacionadas a esse pedido serão excluídas.");
         System.out.println("1. Sim");
         System.out.println("2. Não");
-        int escolhafinal = ValidacaoHelper.lerInteiro(sc, "Confirme: ");
+
+        int escolhafinal;
+        do {
+            escolhafinal = ValidacaoHelper.lerInteiro(sc, "Confirme: ");
+            if (escolhafinal != 1 && escolhafinal != 2 ){
+                System.out.println("Opção inválida tente novamente");
+            }
+        } while (escolhafinal != 1 && escolhafinal != 2 );
 
         if (escolhafinal == 1) {
             pedidoService.excluirPedido(pedidoParaExcluir.getId_pedido());
-            System.out.println("Pedido excluído com sucesso!");
         } else {
             System.out.println("Operação cancelada!");
         }
@@ -270,13 +259,20 @@ public class PedidoView {
         }
         System.out.println("0 - Cancelar");
 
-        int escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ") - 1;
+        int escolha;
+        do {
+            escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+            if (escolha < 0 || escolha > mesas.size()) {
+                System.out.println("Opção inválida. Tente novamente!");
+            }
+        } while (escolha < 0 || escolha > mesas.size());
 
-        if (escolha < 0 || escolha >= mesas.size()) {
-            System.out.println("Operação cancelada ou opção inválida.");
+        if (escolha == 0) {
+            System.out.println("Operação cancelada!");
             return null;
         }
-        return mesas.get(escolha);
+
+        return mesas.get(escolha - 1);
     }
 
     private Funcionario selecionarFuncionario() {
@@ -295,13 +291,15 @@ public class PedidoView {
         }
         System.out.println("0 - Cancelar");
 
-        int escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ") - 1;
+        int escolha;
+        do {
+            escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+            if (escolha < 0 || escolha > funcionarios.size()) {
+                System.out.println("Opção inválida. Tente novamente!");
+            }
+        } while (escolha < 0 || escolha > funcionarios.size());
 
-        if (escolha < 0 || escolha >= funcionarios.size()) {
-            System.out.println("Operação cancelada ou opção inválida.");
-            return null;
-        }
-        return funcionarios.get(escolha);
+        return funcionarios.get(escolha - 1);
     }
 
     private Item selecionarItem() {
@@ -320,12 +318,58 @@ public class PedidoView {
         }
         System.out.println("0 - Cancelar");
 
-        int escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ") - 1;
+        int escolha;
+        do {
+            escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+            if (escolha < 0 || escolha > items.size()) {
+                System.out.println("Opção inválida. Tente novamente!");
+            }
+        } while (escolha < 0 || escolha > items.size());
 
-        if (escolha < 0 || escolha >= items.size()) {
-            System.out.println("Operação cancelada ou opção inválida.");
-            return null;
+        return items.get(escolha - 1);
+    }
+
+    private void adicionarItensAoPedido(int idPedido) {
+        int querAdicionar = 1;
+        while (querAdicionar == 1) {
+            Item itemSelecionado = selecionarItem();
+            if (itemSelecionado == null) break;
+
+            int quantidadePedida = ValidacaoHelper.lerInteiro(sc, "Quantidade: ");
+
+            List<Produto> receita = receitaService.listarReceita(itemSelecionado.getId_item());
+            boolean estoqueSuficiente = true;
+
+            for (Produto produtoDaReceita : receita) {
+                Produto produtoEmEstoque = produtoService.findById(produtoDaReceita.getId_produto());
+                double quantidadeNecessaria = produtoDaReceita.getQuantidade() * quantidadePedida;
+
+                if (produtoEmEstoque.getQuantidade() < quantidadeNecessaria) {
+                    System.out.printf("Erro: Estoque insuficiente para '%s'. Necessário: %.2f, Disponível: %.2f\n",
+                            produtoEmEstoque.getNome(), quantidadeNecessaria, produtoEmEstoque.getQuantidade());
+                    estoqueSuficiente = false;
+                    break;
+                }
+            }
+
+            if (estoqueSuficiente) {
+                for (Produto produtoDaReceita : receita) {
+                    Produto produtoEmEstoque = produtoService.findById(produtoDaReceita.getId_produto());
+                    double quantidadeADeduzir = produtoDaReceita.getQuantidade() * quantidadePedida;
+                    double novoEstoque = produtoEmEstoque.getQuantidade() - quantidadeADeduzir;
+                    produtoEmEstoque.setQuantidade(novoEstoque);
+                    produtoService.editarProduto(produtoEmEstoque);
+                }
+
+                PedidoItem pedidoItem = new PedidoItem(idPedido, itemSelecionado.getId_item(), quantidadePedida);
+                pedidoItemService.adicionarItemAoPedido(pedidoItem);
+                System.out.println("Item '" + itemSelecionado.getNome() + "' adicionado e estoque atualizado.");
+
+            } else {
+                System.out.println("O item não foi adicionado ao pedido por falta de estoque.");
+            }
+
+            querAdicionar = ValidacaoHelper.lerInteiro(sc, "\nDeseja adicionar outro item?\n1. Sim\n2. Não\nEscolha uma opção: ");
         }
-        return items.get(escolha);
     }
 }

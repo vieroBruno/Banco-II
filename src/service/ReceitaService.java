@@ -29,4 +29,8 @@ public class ReceitaService {
 	public void excluirReceita(int id_receita, int id_produto) {
 		repository.delete(id_receita, id_produto);
 	}
+
+    public boolean produtoJaExisteNaReceita(int id_item, int id_produto) {
+        return repository.produtoJaExisteNaReceita(id_item, id_produto);
+    }
 }

@@ -65,8 +65,25 @@ public class JdbcProdutoRepository implements ProdutoRepository {
 
     @Override
     public Produto findById(int id_produto) {
-        // Implementação futura
-        return null;
+        String query = "SELECT id_produto, nome, unidade_medida, quantidade FROM produtos WHERE id_produto = ?";
+        Produto produto = null;
+        try (Connection con = new Conexao().getConnection();
+             PreparedStatement st = con.prepareStatement(query)) {
+            st.setInt(1, id_produto);
+            try (ResultSet result = st.executeQuery()) {
+                if (result.next()) {
+                    produto = new Produto(
+                            result.getString("nome"),
+                            result.getString("unidade_medida"),
+                            result.getDouble("quantidade")
+                    );
+                    produto.setId_produto(result.getInt("id_produto"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar produto por ID", e);
+        }
+        return produto;
     }
 
     @Override

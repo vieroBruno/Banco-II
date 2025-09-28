@@ -1,6 +1,6 @@
 package view;
 
-import model.Funcionario;
+import util.ValidacaoHelper;
 import model.Mesa;
 import repository.jdbc.JdbcMesaRepository;
 import service.MesaService;
@@ -23,8 +23,7 @@ public class MesaView {
 				System.out.println("4. Excluir Mesa");
 				System.out.println("0. Voltar");
 
-				int opcao = sc.nextInt();
-				sc.nextLine();
+				int opcao = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
 
 				switch (opcao) {
 					case 1 :
@@ -46,57 +45,75 @@ public class MesaView {
 		}
 
 		private void cadastrar() {
-			System.out.print("Numero: ");
-			int numero = sc.nextInt();
+            int numero;
+            while (true) {
+                numero = ValidacaoHelper.lerInteiro(sc, "Numero: ");
+                if (numero == 0) {
+                    System.out.println("Mesa não pode ter numero igual a zero");
+                    numero = ValidacaoHelper.lerInteiro(sc, "Numero: ");
+                }
+                if (mesaService.findByNumero(numero) == null) {
+                    break;
+                } else {
+                    System.out.println("Erro: Já existe uma mesa cadastrada com este número. Tente outro.");
+                }
+            }
 
-			System.out.print("Capacidade: ");
-			int capacidade = sc.nextInt();
+            int capacidade = ValidacaoHelper.lerInteiro(sc, "Capacidade: ");
 
-			Mesa mesa = new Mesa(0,numero, capacidade);
-			mesaService.cadastrarMesa(mesa);
+            Mesa mesa = new Mesa(0, numero, capacidade);
+            mesaService.cadastrarMesa(mesa);
 		}
 
 		private void editar()  {
-			System.out.println("\n--- Selecione a Mesa para editar ---");
-			List<Mesa> mesas = listar("editar");
+            System.out.println("\n--- Selecione a Mesa para editar ---");
+            List<Mesa> mesas = listar("editar");
 
-            if(mesas.isEmpty()) {
+            if (mesas.isEmpty()) {
                 return;
             }
 
-			System.out.println("0 - Cancelar");
+            System.out.println("0 - Cancelar");
 
-			int escolha = -1;
-			while (escolha < 0 || escolha > mesas.size()) {
-				System.out.println("Escolha uma opção:");
-				try {
-					escolha = sc.nextInt();
-					if (escolha < 0 || escolha > mesas.size()) {
-						System.out.println("Opção inválida. Tente novamente!");
-					}
-				} catch(InputMismatchException e) {
-					System.out.println("Entrada inválida. Por favor, digite um número.");
-					sc.next();
-				}
-			}
-			sc.nextLine();
-			if(escolha == 0) {
-				System.out.println("Operação cancelada!");
+            int escolha;
+            do {
+                escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+                if (escolha < 0 || escolha > mesas.size()) {
+                    System.out.println("Opção inválida. Tente novamente!");
+                }
+            } while (escolha < 0 || escolha > mesas.size());
+
+            if (escolha == 0) {
+                System.out.println("Operação cancelada!");
                 return;
-			}
+            }
 
-			Mesa mesaParaEditar = mesas.get(escolha -1);
+            Mesa mesaParaEditar = mesas.get(escolha);
+            Mesa mesaAtualizada = new Mesa(mesaParaEditar.getId_mesa(), mesaParaEditar.getNumero(), mesaParaEditar.getCapacidade());
 
-			System.out.println("Editando mesa numero: " + mesaParaEditar.getNumero());
+            System.out.println("Editando mesa numero: " + mesaParaEditar.getNumero());
 
-			System.out.print("Novo numero: ");
-			int numero = sc.nextInt();
+            System.out.println("Deseja alterar o número da mesa? (S/N)");
+            if (sc.nextLine().equalsIgnoreCase("S")) {
+                int novoNumero;
+                while (true) {
+                    novoNumero = ValidacaoHelper.lerInteiro(sc, "Novo numero: ");
+                    Mesa mesaExistente = mesaService.findByNumero(novoNumero);
+                    if (mesaExistente == null || mesaExistente.getId_mesa() == mesaParaEditar.getId_mesa()) {
+                        mesaAtualizada.setNumero(novoNumero);
+                        break;
+                    } else {
+                        System.out.println("Erro: Já existe uma mesa cadastrada com este número. Tente outro.");
+                    }
+                }
+            }
 
-			System.out.print("Nova capacidade: ");
-			int capacidade = sc.nextInt();
+            System.out.println("Deseja alterar a capacidade da mesa? (S/N)");
+            if (sc.nextLine().equalsIgnoreCase("S")) {
+                mesaAtualizada.setCapacidade(ValidacaoHelper.lerInteiro(sc, "Nova capacidade: "));
+            }
 
-			Mesa mesa = new Mesa(mesaParaEditar.getId_mesa(), numero, capacidade);
-			mesaService.editarMesa(mesa);
+            mesaService.editarMesa(mesaAtualizada);
 		}
 		private List<Mesa> listar(String metodo)  {
             List<Mesa> mesas = mesaService.listarMesa();
@@ -125,49 +142,39 @@ public class MesaView {
 
             System.out.println("0 - Cancelar");
 
-            int escolha = -1;
-            while (escolha < 0 || escolha > mesas.size()) {
-                System.out.println("Escolha uma opção:");
-                try {
-                    escolha = sc.nextInt();
-                    if (escolha < 0 || escolha > mesas.size()) {
-                        System.out.println("Opção inválida. Tente novamente!");
-                    }
-                } catch(InputMismatchException e) {
-                    System.out.println("Entrada inválida. Por favor, digite um número.");
-                    sc.next();
+            int escolha;
+            do {
+                escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+                if (escolha < 0 || escolha > mesas.size()) {
+                    System.out.println("Opção inválida. Tente novamente!");
                 }
-            }
-            sc.nextLine();
-            if(escolha == 0) {
+            } while (escolha < 0 || escolha > mesas.size());
+
+            if (escolha == 0) {
                 System.out.println("Operação cancelada!");
+                return;
             }
 
             Mesa mesaParaExcluir = mesas.get(escolha -1);
 
-            int escolhafinal = -1;
-            while(escolhafinal != 1 && escolhafinal != 2) {
-                System.out.println("Deseja realmente excluir essa mesa? : " + mesaParaExcluir.getNumero() +
-                " Todas as informações relaciondas com essa mesa serão excluidas");
-                System.out.println("1. Sim");
-                System.out.println("2. Não");
-                try {
-                    escolhafinal = sc.nextInt();
-                    if(escolhafinal != 1 && escolhafinal != 2) {
-                        System.out.println("Opção inválida. Tente novamente!");
-                        sc.next();
-                    }
-                } catch (InputMismatchException e) {
-                    System.out.println("Entrada inválida. Por favor, digite um número.");
-                    sc.next();
+            System.out.println("Deseja realmente excluir a mesa " + mesaParaExcluir.getNumero() + "?");
+            System.out.println("Todas as informações relacionadas com essa mesa serão excluidas.");
+            System.out.println("1. Sim");
+            System.out.println("2. Não");
+
+            int escolhafinal;
+            do {
+                escolhafinal = ValidacaoHelper.lerInteiro(sc, "Confirme: ");
+                if (escolhafinal != 1 && escolhafinal != 2 ){
+                    System.out.println("Opção inválida tente novamente");
                 }
-            }
-            sc.nextLine();
-            if (escolhafinal == 2) {
+            } while (escolhafinal != 1 && escolhafinal != 2 );
+
+            if (escolhafinal == 1) {
+                mesaService.excluirMesa(mesaParaExcluir.getId_mesa());
+            } else {
                 System.out.println("Operação cancelada!");
-                return;
             }
-            mesaService.excluirMesa(mesaParaExcluir.getId_mesa());
 		}
 
 

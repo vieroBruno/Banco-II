@@ -113,4 +113,28 @@ public class JdbcMesaRepository implements MesaRepository {
         }
         return mesas;
     }
+
+    @Override
+    public Mesa findByNumero(int numero) {
+        String query = "SELECT id_mesa, numero, capacidade FROM MESAS WHERE numero = ?";
+        Mesa mesa = null;
+
+        try (Connection con = new Conexao().getConnection();
+             PreparedStatement st = con.prepareStatement(query)) {
+
+            st.setInt(1, numero);
+            try (ResultSet result = st.executeQuery()) {
+                if (result.next()) {
+                    mesa = new Mesa(
+                            result.getInt("id_mesa"),
+                            result.getInt("numero"),
+                            result.getInt("capacidade")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar mesa por número", e);
+        }
+        return mesa;
+    }
 }

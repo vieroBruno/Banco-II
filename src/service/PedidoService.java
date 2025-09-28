@@ -16,7 +16,6 @@ public class PedidoService {
 
     public int cadastrarPedido(Pedido pedido) {
         if (repository.existePedidoAtivoNaMesa(pedido.getId_mesa())) {
-            System.out.println("Erro: Esta mesa já possui um pedido ativo.");
             return -1;
         }
         return repository.save(pedido);

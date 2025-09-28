@@ -28,4 +28,8 @@ public class ProdutoService {
     public void excluirProduto(int id_produto) {
         repository.delete(id_produto);
     }
+
+    public Produto findById(int id_produto) {
+        return repository.findById(id_produto);
+    }
 }

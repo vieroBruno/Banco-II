@@ -3,6 +3,7 @@ package view;
 import model.Funcionario;
 import repository.jdbc.JdbcFuncionarioRepository;
 import service.FuncionarioService;
+import util.ValidacaoHelper;
 
 import java.util.*;
 
@@ -20,8 +21,7 @@ public class FuncionarioView {
             System.out.println("4. Excluir Funcionários");
             System.out.println("0. Voltar");
 
-            int opcao = sc.nextInt();
-            sc.nextLine();
+            int opcao = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
 
             switch (opcao) {
                 case 1 :
@@ -43,18 +43,13 @@ public class FuncionarioView {
     }
 
     private void cadastrar() {
+        String nome = ValidacaoHelper.isStringValida(sc, "Nome: ");
 
-        System.out.print("Nome: ");
-        String nome = sc.nextLine();
+        String cargo = ValidacaoHelper.isStringValida(sc,"Cargo: ");
 
-        System.out.print("Cargo: ");
-        String cargo = sc.nextLine();
+        String telefone = ValidacaoHelper.lerTelefone(sc, "Telefone (com DDD): ");
 
-        System.out.print("Telefone: ");
-        String telefone = sc.nextLine();
-
-        System.out.print("Salário: ");
-        double salario = sc.nextDouble();
+        double salario = ValidacaoHelper.lerDouble(sc, "Salário: ");
 
         Funcionario funcionario = new Funcionario(0,nome, cargo, salario, telefone);
         funcionarioService.cadastrarFuncionario(funcionario);
@@ -69,44 +64,47 @@ public class FuncionarioView {
         }
         System.out.println("0 - Cancelar");
 
-        int escolha = -1;
-        while (escolha < 0 || escolha > funcionarios.size()) {
-            System.out.println("Escolha uma opção:");
-            try {
-                escolha = sc.nextInt();
-                if (escolha < 0 || escolha > funcionarios.size()) {
-                    System.out.println("Opção inválida. Tente novamente!");
-                }
-            } catch(InputMismatchException e) {
-                System.out.println("Entrada inválida. Por favor, digite um número.");
-                sc.next();
+        int escolha;
+
+        do {
+            escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+            if (escolha < 0 || escolha > funcionarios.size()) {
+                System.out.println("Opção inválida. Tente novamente!");
             }
-        }
-        sc.nextLine();
+        } while (escolha < 0 || escolha > funcionarios.size());
+
         if (escolha == 0) {
             System.out.println("Operação cancelada!");
             return;
         }
 
-        Funcionario funcionarioParaEditar = funcionarios.get(escolha - 1);
+        Funcionario fParaEditar = funcionarios.get(escolha - 1);
+        Funcionario fAtualizado = new Funcionario(fParaEditar.getIdFuncionario(), fParaEditar.getNome(), fParaEditar.getCargo(), fParaEditar.getSalario(), fParaEditar.getTelefone());
 
-        System.out.println("Editando dados de: " + funcionarioParaEditar.getNome());
+        System.out.println("Editando dados de: " + fAtualizado.getNome());
 
-        System.out.print("Novo nome: ");
-        String nome = sc.nextLine();
 
-        System.out.print("Novo cargo: ");
-        String cargo = sc.nextLine();
+        System.out.println("Deseja alterar o nome? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            fAtualizado.setNome(ValidacaoHelper.isStringValida(sc,"Novo nome: "));
+        }
 
-        System.out.print("Novo salário: ");
-        double salario = sc.nextDouble();
-        sc.nextLine();
+        System.out.println("Deseja alterar o cargo? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            fAtualizado.setCargo(ValidacaoHelper.isStringValida(sc,"Novo cargo: "));
+        }
 
-        System.out.print("Telefone: ");
-        String telefone = sc.nextLine();
+        System.out.println("Deseja alterar o salário? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            fAtualizado.setSalario(ValidacaoHelper.lerDouble(sc, "Novo salário: "));
+        }
 
-        Funcionario funcionario = new Funcionario(funcionarioParaEditar.getIdFuncionario(), nome, cargo, salario, telefone);
-        funcionarioService.editarFuncionario(funcionario);
+        System.out.println("Deseja alterar o telefone? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            fAtualizado.setTelefone(ValidacaoHelper.lerTelefone(sc, "Novo telefone (com DDD): "));
+        }
+
+        funcionarioService.editarFuncionario(fAtualizado);
     }
     private List<Funcionario> listar(String metodo)  {
         List<Funcionario> funcionarios = funcionarioService.listarFuncionario();
@@ -136,51 +134,40 @@ public class FuncionarioView {
 
         System.out.println("0 - Cancelar");
 
-        int escolha = -1;
-        while (escolha < 0 || escolha > funcionarios.size()) {
-            System.out.println("Escolha uma opção:");
-            try {
-                escolha = sc.nextInt();
-                if (escolha < 0 || escolha > funcionarios.size()) {
-                    System.out.println("Opção inválida. Tente novamente!");
-                    sc.next();
-                }
-            } catch(InputMismatchException e) {
-                System.out.println("Entrada inválida. Por favor, digite um número.");
-                sc.next();
+        int escolha;
+        do {
+            escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+            if (escolha < 0 || escolha > funcionarios.size()) {
+                System.out.println("Opção inválida. Tente novamente!");
             }
-        }
-        sc.nextLine();
+        } while (escolha < 0 || escolha > funcionarios.size());
+
         if (escolha == 0) {
             System.out.println("Operação cancelada!");
             return;
         }
+
         Funcionario funcionarioParaExcluir = funcionarios.get(escolha - 1);
 
-        int escolhafinal = -1;
-        while(escolhafinal != 1 && escolhafinal != 2) {
-            System.out.println("Deseja realmente excluir esse funcionário? : " + funcionarioParaExcluir.getNome() +" Todas as informações relacionadas " +
-            "a esse funcionário serão excluidas juntos");
-            System.out.println("1. Sim");
-            System.out.println("2. Não");
-            try {
-                escolhafinal = sc.nextInt();
-                if(escolhafinal != 1 && escolhafinal != 2) {
-                    System.out.println("Opção inválida. Tente novamente!");
-                    sc.next();
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Entrada inválida. Por favor, digite um número.");
-                sc.next();
-            }
-        }
-        sc.nextLine();
-        if (escolha == 2) {
-            System.out.println("Operação cancelada!");
-            return;
-        }
-        funcionarioService.excluirFuncionario(funcionarioParaExcluir.getIdFuncionario());
+        System.out.println("Deseja realmente excluir esse funcionário? : " + funcionarioParaExcluir.getNome());
+        System.out.println("Todas as informações relacionadas a esse funcionário serão excluidas.");
+        System.out.println("1. Sim");
+        System.out.println("2. Não");
 
+        int escolhafinal;
+        do {
+            escolhafinal = ValidacaoHelper.lerInteiro(sc, "Confirme: ");
+            if (escolhafinal != 1 && escolhafinal != 2 ){
+                System.out.println("Opção inválida tente novamente");
+            }
+        } while (escolhafinal != 1 && escolhafinal != 2 );
+
+
+        if (escolhafinal == 1) {
+            funcionarioService.excluirFuncionario(funcionarioParaExcluir.getIdFuncionario());
+        } else {
+            System.out.println("Operação cancelada!");
+        }
     }
 
 
