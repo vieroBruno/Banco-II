@@ -1,0 +1,80 @@
+CREATE TABLE receitas (
+    id_receitas serial PRIMARY KEY,
+    quantidade_necessaria decimal,
+    fk_item_id_items serial,
+    fk_produtos_id_produto serial
+);
+
+CREATE TABLE item (
+    id_items serial PRIMARY KEY,
+    nome varchar,
+    preco_venda decimal,
+    descricao varchar
+);
+
+CREATE TABLE pedido_itens (
+    id_produtos_pedidos serial PRIMARY KEY,
+    quantidade integer,
+    fk_pedidos_id_pediido serial,
+    fk_item_id_items serial
+);
+
+CREATE TABLE produtos (
+    id_produto serial PRIMARY KEY,
+    nome varchar,
+    unidade_medida varchar
+);
+
+CREATE TABLE funcionarios (
+    id_funcionario serial PRIMARY KEY,
+    nome varchar,
+    cargo varchar,
+    salario decimal,
+    telefone varchar
+);
+
+CREATE TABLE pedidos (
+    id_pediido serial PRIMARY KEY,
+    data_pedido timestamp,
+    status varchar,
+    fk_mesas_id_mesa serial,
+    fk_funcionarios_id_funcionario serial
+);
+
+CREATE TABLE mesas (
+    id_mesa serial PRIMARY KEY,
+    numero integer,
+    capacidade integer
+);
+
+
+
+ALTER TABLE pedidos ADD CONSTRAINT FK_pedidos_2
+    FOREIGN KEY (fk_mesas_id_mesa)
+    REFERENCES mesas (id_mesa)
+    ON DELETE CASCADE;
+ 
+ALTER TABLE pedidos ADD CONSTRAINT FK_pedidos_3
+    FOREIGN KEY (fk_funcionarios_id_funcionario)
+    REFERENCES funcionarios (id_funcionario)
+    ON DELETE CASCADE;
+ 
+ALTER TABLE receitas ADD CONSTRAINT FK_receitas_2
+    FOREIGN KEY (fk_item_id_items)
+    REFERENCES item (id_items)
+    ON DELETE CASCADE;
+ 
+ALTER TABLE receitas ADD CONSTRAINT FK_receitas_3
+    FOREIGN KEY (fk_produtos_id_produto)
+    REFERENCES produtos (id_produto)
+    ON DELETE CASCADE;
+ 
+ALTER TABLE pedido_itens ADD CONSTRAINT FK_pedido_itens_2
+    FOREIGN KEY (fk_pedidos_id_pediido)
+    REFERENCES pedidos (id_pediido)
+    ON DELETE CASCADE;
+ 
+ALTER TABLE pedido_itens ADD CONSTRAINT FK_pedido_itens_3
+    FOREIGN KEY (fk_item_id_items)
+    REFERENCES item (id_items)
+    ON DELETE CASCADE;

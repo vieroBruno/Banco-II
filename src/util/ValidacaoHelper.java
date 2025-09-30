@@ -37,7 +37,12 @@ public final class ValidacaoHelper {
             System.out.print(mensagem);
             try {
                 valor = sc.nextDouble();
-                valido = true;
+                if ( valor > 0) {
+                    valido = true;
+
+                } else {
+                    System.out.println("Erro: Por favor, digite um número positivo.");
+                }
             } catch (InputMismatchException e) {
                 System.out.println("Erro: Por favor, digite um número válido (ex: 1500.50).");
             } finally {

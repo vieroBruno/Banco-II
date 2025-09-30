@@ -22,6 +22,7 @@ public class Menu {
             System.out.println("4 - Item");
             System.out.println("5 - Receitas");
             System.out.println("6 - Produtos");
+            System.out.println("7 - Relatórios");
             System.out.println("0 - Sair");
 
             opcao = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
@@ -44,6 +45,9 @@ public class Menu {
                     break;
                 case 6:
                     new ProdutoView().exibirMenu();
+                    break;
+                case 7:
+                    new RelatorioView().exibirMenu();
                     break;
                 case 0:
                     break;
