@@ -288,3 +288,4 @@ Guia para configurar o projeto no WSL e executá-lo via IntelliJ IDEA no Windows
 
 O IntelliJ usará o JDK configurado dentro do WSL para compilar e executar seu projeto, conectando-se ao banco de dados PostgreSQL que também está rodando no WSL.
 
+
