@@ -28,4 +28,12 @@ public class MesaService {
 	public void excluirMesa(int id_mesa) {
 		repository.delete(id_mesa);
 	}
+
+    public Mesa findById(int id_mesa) {
+        return repository.findById(id_mesa);
+    }
+
+    public Mesa findByNumero(int numero) {
+        return repository.findByNumero(numero);
+    }
 }

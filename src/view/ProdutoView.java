@@ -3,6 +3,7 @@ package view;
 import model.Produto;
 import repository.jdbc.JdbcProdutoRepository;
 import service.ProdutoService;
+import util.ValidacaoHelper;
 
 import java.util.InputMismatchException;
 import java.util.List;
@@ -22,8 +23,7 @@ public class ProdutoView {
             System.out.println("4. Excluir Produto");
             System.out.println("0. Voltar");
 
-            int opcao = sc.nextInt();
-            sc.nextLine();
+            int opcao = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
 
             switch (opcao) {
                 case 1:
@@ -51,11 +51,9 @@ public class ProdutoView {
         System.out.print("Nome: ");
         String nome = sc.nextLine();
 
-        System.out.print("Unidade de Medida: ");
-        String unidadeMedida = sc.nextLine();
+        String unidadeMedida = ValidacaoHelper.lerUnidadeMedidaValida(sc, "Unidade de Medida (Quilogramas, Gramas, Litros, Mililitros): ");
 
-        System.out.print("Quantidade: ");
-        double quantidade = sc.nextDouble();
+        double quantidade = ValidacaoHelper.lerDouble(sc, "Quantidade: ");
 
         Produto produto = new Produto(nome, unidadeMedida, quantidade);
         produtoService.cadastrarProduto(produto);
@@ -70,42 +68,42 @@ public class ProdutoView {
         }
         System.out.println("0 - Cancelar");
 
-        int escolha = -1;
-        while (escolha < 0 || escolha > produtos.size()) {
-            System.out.println("Escolha uma opção:");
-            try {
-                escolha = sc.nextInt();
-                if (escolha < 0 || escolha > produtos.size()) {
-                    System.out.println("Opção inválida. Tente novamente!");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Entrada inválida. Por favor, digite um número.");
-                sc.next();
+        int escolha;
+        do {
+            escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+            if (escolha < 0 || escolha > produtos.size()) {
+                System.out.println("Opção inválida. Tente novamente!");
             }
-        }
-        sc.nextLine();
+        } while (escolha < 0 || escolha > produtos.size());
+
         if (escolha == 0) {
             System.out.println("Operação cancelada!");
             return;
         }
 
         Produto produtoParaEditar = produtos.get(escolha - 1);
+        Produto produtoAtualizado = new Produto(produtoParaEditar.getNome(), produtoParaEditar.getUnidade_medida(), produtoParaEditar.getQuantidade());
+        produtoAtualizado.setId_produto(produtoParaEditar.getId_produto());
 
         System.out.println("Editando dados de: " + produtoParaEditar.getNome());
 
-        System.out.print("Novo nome: ");
-        String nome = sc.nextLine();
+        System.out.println("Deseja alterar o nome? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            System.out.print("Novo nome: ");
+            produtoAtualizado.setNome(sc.nextLine());
+        }
 
-        System.out.print("Nova unidade de medida: ");
-        String unidadeMedida = sc.nextLine();
+        System.out.println("Deseja alterar a unidade de medida? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            produtoAtualizado.setUnidade_medida(ValidacaoHelper.lerUnidadeMedidaValida(sc, "Nova unidade de medida: "));
+        }
 
-        System.out.print("Nova quantidade: ");
-        double quantidade = sc.nextDouble();
+        System.out.println("Deseja alterar a quantidade? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            produtoAtualizado.setQuantidade(ValidacaoHelper.lerDouble(sc, "Nova quantidade: "));
+        }
 
-
-        Produto produto = new Produto(nome, unidadeMedida, quantidade);
-        produto.setId_produto(produtoParaEditar.getId_produto());
-        produtoService.editarProduto(produto);
+        produtoService.editarProduto(produtoAtualizado);
     }
 
     private List<Produto> listar(String metodo) {
@@ -135,48 +133,39 @@ public class ProdutoView {
 
         System.out.println("0 - Cancelar");
 
-        int escolha = -1;
-        while (escolha < 0 || escolha > produtos.size()) {
-            System.out.println("Escolha uma opção:");
-            try {
-                escolha = sc.nextInt();
-                if (escolha < 0 || escolha > produtos.size()) {
-                    System.out.println("Opção inválida. Tente novamente!");
-                    sc.next();
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Entrada inválida. Por favor, digite um número.");
-                sc.next();
+        int escolha;
+        do {
+            escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+            if (escolha < 0 || escolha > produtos.size()) {
+                System.out.println("Opção inválida. Tente novamente!");
             }
-        }
-        sc.nextLine();
+        } while (escolha < 0 || escolha > produtos.size());
+
         if (escolha == 0) {
             System.out.println("Operação cancelada!");
             return;
         }
+
         Produto produtoParaExcluir = produtos.get(escolha - 1);
 
-        int escolhafinal = -1;
-        while (escolhafinal != 1 && escolhafinal != 2) {
-            System.out.println("Deseja realmente excluir esse produto? : " + produtoParaExcluir.getNome());
-            System.out.println("1. Sim");
-            System.out.println("2. Não");
-            try {
-                escolhafinal = sc.nextInt();
-                if (escolhafinal != 1 && escolhafinal != 2) {
-                    System.out.println("Opção inválida. Tente novamente!");
-                    sc.next();
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Entrada inválida. Por favor, digite um número.");
-                sc.next();
-            }
-        }
-        sc.nextLine();
-        if (escolhafinal == 2) {
+        System.out.println("Deseja realmente excluir esse produto? : " + produtoParaExcluir.getNome());
+        System.out.println("Todas as informações relacionadas com esse Produto serão excluidas.");
+        System.out.println("1. Sim");
+        System.out.println("2. Não");
+
+        int escolhafinal;
+        do {
+             escolhafinal = ValidacaoHelper.lerInteiro(sc, "Confirme: ");
+             if (escolhafinal != 1 && escolhafinal != 2 ){
+                 System.out.println("Opção inválida tente novamente");
+             }
+        } while (escolhafinal != 1 && escolhafinal != 2 );
+
+
+        if (escolhafinal == 1) {
+            produtoService.excluirProduto(produtoParaExcluir.getId_produto());
+        } else {
             System.out.println("Operação cancelada!");
-            return;
         }
-        produtoService.excluirProduto(produtoParaExcluir.getId_produto());
     }
 }

@@ -22,7 +22,7 @@ public class JdbcReceitaRepository implements ReceitaRepository {
 			st.setInt(2, receita.getId_produto());
 			st.setDouble(3, receita.getQuantidade());
 			st.execute();
-			System.out.println("Receita cadastrada com sucesso!");
+			System.out.println("Produto adicionado a receita com sucesso!");
 		} catch (SQLException e) {
 			throw new RepositoryException("Erro ao salvar receita", e);
 		}
@@ -39,7 +39,7 @@ public class JdbcReceitaRepository implements ReceitaRepository {
             st.setInt(2, receita.getId_item());
             st.setInt(3, receita.getId_produto());
             st.execute();
-            System.out.println("Quantidade do ingrediente alterada com sucesso!");
+            System.out.println("Quantidade do produto alterada com sucesso!");
         } catch (SQLException e) {
             throw new RepositoryException("Erro ao alterar receita", e);
         }
@@ -55,9 +55,9 @@ public class JdbcReceitaRepository implements ReceitaRepository {
             st.setInt(1, id_item);
             st.setInt(2, id_produto);
             st.execute();
-            System.out.println("Ingrediente removido da receita com sucesso!");
+            System.out.println("Produto removido da receita com sucesso!");
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao excluir ingrediente da receita", e);
+            throw new RuntimeException("Erro ao excluir produto da receita", e);
         }
 	}
 
@@ -68,13 +68,13 @@ public class JdbcReceitaRepository implements ReceitaRepository {
 	}
 
 	@Override
-    public List<Produto> listarIngredientesItem(int id_item) {
+    public List<Produto> listarProdutosItem(int id_item) {
         String query = "SELECT p.id_produto, p.nome, p.unidade_medida, r.quantidade_necessaria " +
                 "FROM item i " +
                 "JOIN receitas r ON r.fk_item_id_items = i.id_items " +
                 "JOIN produtos p ON p.id_produto = r.fk_produtos_id_produto " +
                 "WHERE i.id_items = ?";
-        List<Produto> ingredientes = new ArrayList<>();
+        List<Produto> produtos = new ArrayList<>();
 
         try (Connection con = new Conexao().getConnection();
              PreparedStatement st = con.prepareStatement(query)) {
@@ -89,12 +89,30 @@ public class JdbcReceitaRepository implements ReceitaRepository {
                             (int) result.getDouble("quantidade_necessaria")
                     );
                     produto.setId_produto(result.getInt("id_produto"));
-                    ingredientes.add(produto);
+                    produtos.add(produto);
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao listar os ingredientes da receita", e);
+            throw new RuntimeException("Erro ao listar os produtos da receita", e);
         }
-        return ingredientes;
+        return produtos;
+    }
+
+    @Override
+    public boolean produtoJaExisteNaReceita(int id_item, int id_produto) {
+        String query = "SELECT COUNT(*) FROM receitas WHERE fk_item_id_items = ? AND fk_produtos_id_produto = ?";
+        try (Connection con = new Conexao().getConnection();
+             PreparedStatement st = con.prepareStatement(query)) {
+            st.setInt(1, id_item);
+            st.setInt(2, id_produto);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao verificar se produto existe na receita", e);
+        }
+        return false;
     }
 }

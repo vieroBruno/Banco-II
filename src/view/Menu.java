@@ -2,6 +2,7 @@ package view;
 
 
 import service.ProdutoService;
+import util.ValidacaoHelper;
 
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -11,7 +12,6 @@ public class Menu {
 
     public void start() throws SQLException {
         int opcao;
-
         do {
             System.out.println("===================================");
             System.out.println("     SISTEMA PARA RESTAURANTE");
@@ -22,10 +22,10 @@ public class Menu {
             System.out.println("4 - Item");
             System.out.println("5 - Receitas");
             System.out.println("6 - Produtos");
+            System.out.println("7 - Relatórios");
             System.out.println("0 - Sair");
-            System.out.print("Escolha uma opção: ");
-            opcao = sc.nextInt();
-            sc.nextLine();
+
+            opcao = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
 
             switch (opcao) {
                 case 1:
@@ -45,6 +45,9 @@ public class Menu {
                     break;
                 case 6:
                     new ProdutoView().exibirMenu();
+                    break;
+                case 7:
+                    new RelatorioView().exibirMenu();
                     break;
                 case 0:
                     break;

@@ -3,6 +3,8 @@ package view;
 import model.Item;
 import repository.jdbc.JdbcItemRepository;
 import service.ItemService;
+import util.ValidacaoHelper;
+
 
 import java.util.InputMismatchException;
 import java.util.List;
@@ -22,8 +24,7 @@ public class ItemView {
 			System.out.println("4. Excluir Item");
 			System.out.println("0. Voltar");
 
-			int opcao = sc.nextInt();
-			sc.nextLine();
+            int opcao = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
 
 			switch (opcao) {
 				case 1:
@@ -48,15 +49,11 @@ public class ItemView {
 	}
 
 	private void cadastrar() {
-		System.out.print("Nome: ");
-		String nome = sc.nextLine();
+        String nome = ValidacaoHelper.isStringValida(sc, "Nome: ");
 
-		System.out.print("Preço de Venda: ");
-		double precoVenda = sc.nextDouble();
-		sc.nextLine();
+        double precoVenda = ValidacaoHelper.lerDouble(sc, "Preço de Venda: ");
 
-		System.out.print("Descrição: ");
-		String descricao = sc.nextLine();
+        String descricao = ValidacaoHelper.isStringValida(sc,"Descrição: ");
 
 		Item item = new Item(nome, precoVenda, descricao);
 		itemService.cadastrarItem(item);
@@ -71,42 +68,43 @@ public class ItemView {
 		}
 		System.out.println("0 - Cancelar");
 
-		int escolha = -1;
-		while (escolha < 0 || escolha > items.size()) {
-			System.out.println("Escolha uma opção:");
-			try {
-				escolha = sc.nextInt();
-				if (escolha < 0 || escolha > items.size()) {
-					System.out.println("Opção inválida. Tente novamente!");
-				}
-			} catch (InputMismatchException e) {
-				System.out.println("Entrada inválida. Por favor, digite um número.");
-				sc.next();
-			}
-		}
-		sc.nextLine();
-		if (escolha == 0) {
-			System.out.println("Operação cancelada!");
-			return;
-		}
+        int escolha;
+        do {
+            escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+            if (escolha < 0 || escolha > items.size()) {
+                System.out.println("Opção inválida. Tente novamente!");
+            }
+        } while (escolha < 0 || escolha > items.size());
 
-		Item itemParaEditar = items.get(escolha - 1);
+        if (escolha == 0) {
+            System.out.println("Operação cancelada!");
+            return;
+        }
 
-		System.out.println("Editando dados de: " + itemParaEditar.getNome());
+        Item itemParaEditar = items.get(escolha - 1);
+        Item itemAtualizado = new Item(itemParaEditar.getNome(), itemParaEditar.getPreco_venda(), itemParaEditar.getDescricao());
+        itemAtualizado.setId_item(itemParaEditar.getId_item());
 
-		System.out.print("Novo nome: ");
-		String nome = sc.nextLine();
+        System.out.println("Editando dados de: " + itemParaEditar.getNome());
 
-		System.out.print("Novo Preço de Venda: ");
-		double precoVenda = sc.nextDouble();
-		sc.nextLine();
+        System.out.println("Deseja alterar o nome? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            System.out.print("Novo nome: ");
+            itemAtualizado.setNome(sc.nextLine());
+        }
 
-		System.out.print("Nova Descrição: ");
-		String descricao = sc.nextLine();
+        System.out.println("Deseja alterar o Preço de Venda? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            itemAtualizado.setPreco_venda(ValidacaoHelper.lerDouble(sc, "Novo Preço de Venda: "));
+        }
 
-		Item item = new Item(nome, precoVenda, descricao);
-		item.setId_item(itemParaEditar.getId_item());
-		itemService.editarItem(item);
+        System.out.println("Deseja alterar a Descrição? (S/N)");
+        if (sc.nextLine().equalsIgnoreCase("S")) {
+            System.out.print("Nova Descrição: ");
+            itemAtualizado.setDescricao(sc.nextLine());
+        }
+
+        itemService.editarItem(itemAtualizado);
 	}
 
 	private List<Item> listar(String metodo) {
@@ -136,48 +134,38 @@ public class ItemView {
 
 		System.out.println("0 - Cancelar");
 
-		int escolha = -1;
-		while (escolha < 0 || escolha > items.size()) {
-			System.out.println("Escolha uma opção:");
-			try {
-				escolha = sc.nextInt();
-				if (escolha < 0 || escolha > items.size()) {
-					System.out.println("Opção inválida. Tente novamente!");
-					sc.next();
-				}
-			} catch (InputMismatchException e) {
-				System.out.println("Entrada inválida. Por favor, digite um número.");
-				sc.next();
-			}
-		}
-		sc.nextLine();
-		if (escolha == 0) {
-			System.out.println("Operação cancelada!");
-			return;
-		}
-		Item itemParaExcluir = items.get(escolha - 1);
+        int escolha;
+        do {
+            escolha = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
+            if (escolha < 0 || escolha > items.size()) {
+                System.out.println("Opção inválida. Tente novamente!");
+            }
+        } while (escolha < 0 || escolha > items.size());
 
-		int escolhafinal = -1;
-		while (escolhafinal != 1 && escolhafinal != 2) {
-			System.out.println("Deseja realmente excluir esse item? : " + itemParaExcluir.getNome());
-			System.out.println("1. Sim");
-			System.out.println("2. Não");
-			try {
-				escolhafinal = sc.nextInt();
-				if (escolhafinal != 1 && escolhafinal != 2) {
-					System.out.println("Opção inválida. Tente novamente!");
-					sc.next();
-				}
-			} catch (InputMismatchException e) {
-				System.out.println("Entrada inválida. Por favor, digite um número.");
-				sc.next();
-			}
-		}
-		sc.nextLine();
-		if (escolhafinal == 2) {
-			System.out.println("Operação cancelada!");
-			return;
-		}
-		itemService.excluirItem(itemParaExcluir.getId_item());
+        if (escolha == 0) {
+            System.out.println("Operação cancelada!");
+            return;
+        }
+
+        Item itemParaExcluir = items.get(escolha - 1);
+
+        System.out.println("Deseja realmente excluir esse item? : " + itemParaExcluir.getNome());
+        System.out.println("Todas as informações relacionadas com esse Item serão excluidas.");
+        System.out.println("1. Sim");
+        System.out.println("2. Não");
+
+        int escolhafinal;
+        do {
+            escolhafinal = ValidacaoHelper.lerInteiro(sc, "Confirme: ");
+            if (escolhafinal != 1 && escolhafinal != 2 ){
+                System.out.println("Opção inválida tente novamente");
+            }
+        } while (escolhafinal != 1 && escolhafinal != 2 );
+
+        if (escolhafinal == 1) {
+            itemService.excluirItem(itemParaExcluir.getId_item());
+        } else {
+            System.out.println("Operação cancelada!");
+        }
 	}
 }
