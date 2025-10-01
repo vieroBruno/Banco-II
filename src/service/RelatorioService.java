@@ -1,6 +1,7 @@
 package service;
 
 import model.Produto;
+import model.RelatorioItem;
 import repository.RelatorioRepository;
 
 import java.time.LocalDate;
@@ -19,11 +20,11 @@ public class RelatorioService {
         return repository.vendasPorPeriodo(inicio, fim);
     }
 
-    public Map<String, Integer> itensMaisVendidos(LocalDate inicio, LocalDate fim) {
+    public List<RelatorioItem> itensMaisVendidos(LocalDate inicio, LocalDate fim) {
         return repository.itensMaisVendidos(inicio, fim);
     }
 
-    public Map<String, Double> itensQueMaisGeramReceita(LocalDate inicio, LocalDate fim) {
+    public List<RelatorioItem> itensQueMaisGeramReceita(LocalDate inicio, LocalDate fim) {
         return repository.itensQueMaisGeramReceita(inicio, fim);
     }
 

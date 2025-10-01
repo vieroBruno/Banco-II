@@ -1,13 +1,13 @@
 package view;
 
 import model.Produto;
+import model.RelatorioItem;
 import repository.jdbc.JdbcRelatorioRepository;
 import service.RelatorioService;
 import util.ValidacaoHelper;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class RelatorioView {
@@ -20,7 +20,7 @@ public class RelatorioView {
             System.out.println("1. Vendas por Período");
             System.out.println("2. Itens Mais Vendidos");
             System.out.println("3. Itens que Mais Geram Receita");
-            System.out.println("4. Relatório de Estoque");
+            System.out.println("4. Relatório de Estoque Baixo");
             System.out.println("0. Voltar ao Menu Principal");
 
             int opcao = ValidacaoHelper.lerInteiro(sc, "Escolha uma opção: ");
@@ -63,15 +63,18 @@ public class RelatorioView {
             return;
         }
 
-        Map<String, Integer> ranking = relatorioService.itensMaisVendidos(inicio, fim);
+        List<RelatorioItem> ranking = relatorioService.itensMaisVendidos(inicio, fim);
 
         if (ranking.isEmpty()) {
             System.out.println("Nenhuma venda de item registrada no período.");
         } else {
-            System.out.println("\nRanking de Itens Mais Vendidos:");
+            System.out.println("\n--- Ranking de Itens Mais Vendidos ---");
             int pos = 1;
-            for (Map.Entry<String, Integer> entry : ranking.entrySet()) {
-                System.out.printf("%d. %s - %d unidades vendidas\n", pos++, entry.getKey(), entry.getValue());
+            for (RelatorioItem item : ranking) {
+                System.out.printf("%d. %s\n", pos++, item.getNome());
+                System.out.printf("   - Descrição: %s\n", item.getDescricao());
+                System.out.printf("   - Preço Unitário: R$ %.2f\n", item.getPrecoVenda());
+                System.out.printf("   - Unidades Vendidas: %d\n\n", item.getQuantidadeVendida());
             }
         }
     }
@@ -86,15 +89,18 @@ public class RelatorioView {
             return;
         }
 
-        Map<String, Double> ranking = relatorioService.itensQueMaisGeramReceita(inicio, fim);
+        List<RelatorioItem> ranking = relatorioService.itensQueMaisGeramReceita(inicio, fim);
 
         if (ranking.isEmpty()) {
             System.out.println("Nenhuma receita gerada no período.");
         } else {
-            System.out.println("\nRanking de Itens por Receita Gerada:");
+            System.out.println("\n--- Ranking de Itens por Receita Gerada ---");
             int pos = 1;
-            for (Map.Entry<String, Double> entry : ranking.entrySet()) {
-                System.out.printf("%d. %s - R$ %.2f\n", pos++, entry.getKey(), entry.getValue());
+            for (RelatorioItem item : ranking) {
+                System.out.printf("%d. %s\n", pos++, item.getNome());
+                System.out.printf("   - Descrição: %s\n", item.getDescricao());
+                System.out.printf("   - Preço Unitário: R$ %.2f\n", item.getPrecoVenda());
+                System.out.printf("   - Receita Total Gerada: R$ %.2f\n\n", item.getReceitaGerada());
             }
         }
     }

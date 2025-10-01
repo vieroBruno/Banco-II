@@ -1,6 +1,7 @@
 package repository.jdbc;
 
 import model.Produto;
+import model.RelatorioItem;
 import repository.RelatorioRepository;
 
 import java.sql.Connection;
@@ -9,9 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class JdbcRelatorioRepository implements RelatorioRepository {
 
@@ -42,15 +41,16 @@ public class JdbcRelatorioRepository implements RelatorioRepository {
     }
 
     @Override
-    public Map<String, Integer> itensMaisVendidos(LocalDate inicio, LocalDate fim) {
-        String query = "SELECT i.nome, SUM(pi.quantidade) AS quantidade_total " +
+    public List<RelatorioItem> itensMaisVendidos(LocalDate inicio, LocalDate fim) {
+        // SQL ATUALIZADA para buscar mais campos
+        String query = "SELECT i.nome, i.descricao, i.preco_venda, SUM(pi.quantidade) AS quantidade_total " +
                 "FROM pedido_itens pi " +
                 "JOIN item i ON pi.fk_item_id_items = i.id_items " +
                 "JOIN pedidos p ON pi.fk_pedidos_id_pediido = p.id_pedido " +
                 "WHERE p.data_pedido BETWEEN ? AND ? " +
-                "GROUP BY i.nome " +
+                "GROUP BY i.nome, i.descricao, i.preco_venda " + // Agrupando pelos novos campos
                 "ORDER BY quantidade_total DESC";
-        Map<String, Integer> ranking = new LinkedHashMap<>(); // Mantém a ordem da consulta
+        List<RelatorioItem> ranking = new ArrayList<>();
 
         try (Connection con = new Conexao().getConnection();
              PreparedStatement st = con.prepareStatement(query)) {
@@ -60,7 +60,12 @@ public class JdbcRelatorioRepository implements RelatorioRepository {
 
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
-                    ranking.put(rs.getString("nome"), rs.getInt("quantidade_total"));
+                    RelatorioItem item = new RelatorioItem();
+                    item.setNome(rs.getString("nome"));
+                    item.setDescricao(rs.getString("descricao"));
+                    item.setPrecoVenda(rs.getDouble("preco_venda"));
+                    item.setQuantidadeVendida(rs.getInt("quantidade_total"));
+                    ranking.add(item);
                 }
             }
         } catch (SQLException e) {
@@ -70,15 +75,16 @@ public class JdbcRelatorioRepository implements RelatorioRepository {
     }
 
     @Override
-    public Map<String, Double> itensQueMaisGeramReceita(LocalDate inicio, LocalDate fim) {
-        String query = "SELECT i.nome, SUM(pi.quantidade * i.preco_venda) AS receita_total " +
+    public List<RelatorioItem> itensQueMaisGeramReceita(LocalDate inicio, LocalDate fim) {
+        // SQL ATUALIZADA para buscar mais campos
+        String query = "SELECT i.nome, i.descricao, i.preco_venda, SUM(pi.quantidade * i.preco_venda) AS receita_total " +
                 "FROM pedido_itens pi " +
                 "JOIN item i ON pi.fk_item_id_items = i.id_items " +
                 "JOIN pedidos p ON pi.fk_pedidos_id_pediido = p.id_pedido " +
                 "WHERE p.data_pedido BETWEEN ? AND ? " +
-                "GROUP BY i.nome " +
+                "GROUP BY i.nome, i.descricao, i.preco_venda " + // Agrupando pelos novos campos
                 "ORDER BY receita_total DESC";
-        Map<String, Double> ranking = new LinkedHashMap<>();
+        List<RelatorioItem> ranking = new ArrayList<>();
 
         try (Connection con = new Conexao().getConnection();
              PreparedStatement st = con.prepareStatement(query)) {
@@ -88,7 +94,12 @@ public class JdbcRelatorioRepository implements RelatorioRepository {
 
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
-                    ranking.put(rs.getString("nome"), rs.getDouble("receita_total"));
+                    RelatorioItem item = new RelatorioItem();
+                    item.setNome(rs.getString("nome"));
+                    item.setDescricao(rs.getString("descricao"));
+                    item.setPrecoVenda(rs.getDouble("preco_venda"));
+                    item.setReceitaGerada(rs.getDouble("receita_total"));
+                    ranking.add(item);
                 }
             }
         } catch (SQLException e) {
@@ -96,6 +107,7 @@ public class JdbcRelatorioRepository implements RelatorioRepository {
         }
         return ranking;
     }
+
 
     @Override
     public List<Produto> relatorioEstoqueBaixo(double nivelMinimo) {
