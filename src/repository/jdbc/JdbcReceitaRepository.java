@@ -86,7 +86,7 @@ public class JdbcReceitaRepository implements ReceitaRepository {
                     Produto produto = new Produto(
                             result.getString("nome"),
                             result.getString("unidade_medida"),
-                            (int) result.getDouble("quantidade_necessaria")
+                            result.getDouble("quantidade_necessaria")
                     );
                     produto.setId_produto(result.getInt("id_produto"));
                     produtos.add(produto);

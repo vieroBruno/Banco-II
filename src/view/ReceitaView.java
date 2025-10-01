@@ -132,7 +132,7 @@ public class ReceitaView {
             for (Produto produto : produtos) {
                 System.out.printf("- %s: %.2f %s\n",
                         produto.getNome(),
-                        (double) produto.getQuantidade(),
+                        produto.getQuantidade(),
                         produto.getUnidade_medida());
             }
         }

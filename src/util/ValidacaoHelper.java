@@ -35,22 +35,25 @@ public final class ValidacaoHelper {
         boolean valido = false;
         while (!valido) {
             System.out.print(mensagem);
-            try {
-                valor = sc.nextDouble();
-                if ( valor > 0) {
-                    valido = true;
+            String input = sc.nextLine();
 
+            try {
+                String inputFormatado = input.replace(',', '.');
+
+                valor = Double.parseDouble(inputFormatado);
+
+                if (valor > 0) {
+                    valido = true;
                 } else {
-                    System.out.println("Erro: Por favor, digite um número positivo.");
+                    System.out.println("Erro: Por favor, digite um número positivo maior que zero.");
                 }
-            } catch (InputMismatchException e) {
-                System.out.println("Erro: Por favor, digite um número válido (ex: 1500.50).");
-            } finally {
-                sc.nextLine();
+            } catch (NumberFormatException e) {
+                System.out.println("Erro: Entrada inválida. Por favor, digite um número válido (ex: 1500.50 ou 0,5).");
             }
         }
         return valor;
     }
+
 
     public static String formatarTelefone(String telefone) {
 
@@ -129,7 +132,7 @@ public final class ValidacaoHelper {
     public static String lerUnidadeMedidaValida(Scanner sc, String mensagem) {
         String unidade = "";
         boolean valido = false;
-        List<String> unidadesValidas = Arrays.asList("Quilogramas", "Litros", "Mililitros", "Gramas");
+        List<String> unidadesValidas = Arrays.asList("Quilogramas", "Litros", "Mililitros", "Gramas", "Unidades");
 
         while (!valido) {
             System.out.print(mensagem);
@@ -140,7 +143,7 @@ public final class ValidacaoHelper {
                 unidade = unidadeFormatada;
                 valido = true;
             } else {
-                System.out.println("Erro: Unidade de medida inválida. Use: Quilogramas, Litros, Mililitros ou Gramas.");
+                System.out.println("Erro: Unidade de medida inválida. Use: Quilogramas, Litros, Mililitros, Gramas ou Unidades.");
             }
         }
         return unidade;

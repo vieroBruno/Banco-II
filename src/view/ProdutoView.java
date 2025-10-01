@@ -51,7 +51,7 @@ public class ProdutoView {
         System.out.print("Nome: ");
         String nome = sc.nextLine();
 
-        String unidadeMedida = ValidacaoHelper.lerUnidadeMedidaValida(sc, "Unidade de Medida (Quilogramas, Gramas, Litros, Mililitros): ");
+        String unidadeMedida = ValidacaoHelper.lerUnidadeMedidaValida(sc, "Unidade de Medida (Quilogramas, Gramas, Litros, Mililitros, Unidades): ");
 
         double quantidade = ValidacaoHelper.lerDouble(sc, "Quantidade: ");
 
