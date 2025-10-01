@@ -1,80 +1,56 @@
-CREATE TABLE receitas (
-    id_receitas serial PRIMARY KEY,
-    quantidade_necessaria decimal,
-    fk_item_id_items serial,
-    fk_produtos_id_produto serial
-);
-
-CREATE TABLE item (
-    id_items serial PRIMARY KEY,
-    nome varchar,
-    preco_venda decimal,
-    descricao varchar
-);
-
-CREATE TABLE pedido_itens (
-    id_produtos_pedidos serial PRIMARY KEY,
-    quantidade integer,
-    fk_pedidos_id_pediido serial,
-    fk_item_id_items serial
-);
-
-CREATE TABLE produtos (
-    id_produto serial PRIMARY KEY,
-    nome varchar,
-    unidade_medida varchar
-);
 
 CREATE TABLE funcionarios (
     id_funcionario serial PRIMARY KEY,
-    nome varchar,
-    cargo varchar,
+    nome varchar(100),
+    cargo varchar(50),
     salario decimal,
-    telefone varchar
-);
-
-CREATE TABLE pedidos (
-    id_pediido serial PRIMARY KEY,
-    data_pedido timestamp,
-    status varchar,
-    fk_mesas_id_mesa serial,
-    fk_funcionarios_id_funcionario serial
+    telefone varchar(15)
 );
 
 CREATE TABLE mesas (
     id_mesa serial PRIMARY KEY,
-    numero integer,
+    numero integer UNIQUE NOT NULL,
     capacidade integer
 );
 
+CREATE TABLE produtos (
+    id_produto serial PRIMARY KEY,
+    nome varchar(100),
+    unidade_medida varchar(20),
+    quantidade decimal
+);
 
+CREATE TABLE item (
+    id_items serial PRIMARY KEY,
+    nome varchar(100),
+    preco_venda decimal,
+    descricao varchar(255)
+);
 
-ALTER TABLE pedidos ADD CONSTRAINT FK_pedidos_2
-    FOREIGN KEY (fk_mesas_id_mesa)
-    REFERENCES mesas (id_mesa)
-    ON DELETE CASCADE;
- 
-ALTER TABLE pedidos ADD CONSTRAINT FK_pedidos_3
-    FOREIGN KEY (fk_funcionarios_id_funcionario)
-    REFERENCES funcionarios (id_funcionario)
-    ON DELETE CASCADE;
- 
-ALTER TABLE receitas ADD CONSTRAINT FK_receitas_2
-    FOREIGN KEY (fk_item_id_items)
-    REFERENCES item (id_items)
-    ON DELETE CASCADE;
- 
-ALTER TABLE receitas ADD CONSTRAINT FK_receitas_3
-    FOREIGN KEY (fk_produtos_id_produto)
-    REFERENCES produtos (id_produto)
-    ON DELETE CASCADE;
- 
-ALTER TABLE pedido_itens ADD CONSTRAINT FK_pedido_itens_2
-    FOREIGN KEY (fk_pedidos_id_pediido)
-    REFERENCES pedidos (id_pediido)
-    ON DELETE CASCADE;
- 
-ALTER TABLE pedido_itens ADD CONSTRAINT FK_pedido_itens_3
-    FOREIGN KEY (fk_item_id_items)
-    REFERENCES item (id_items)
-    ON DELETE CASCADE;
+CREATE TABLE pedidos (
+    id_pedido serial PRIMARY KEY,
+    data_pedido timestamp,
+    status varchar(50),
+    fk_mesas_id_mesa integer,
+    fk_funcionarios_id_funcionario integer,
+    CONSTRAINT fk_pedidos_mesas FOREIGN KEY (fk_mesas_id_mesa) REFERENCES mesas (id_mesa) ON DELETE CASCADE,
+    CONSTRAINT fk_pedidos_funcionarios FOREIGN KEY (fk_funcionarios_id_funcionario) REFERENCES funcionarios (id_funcionario) ON DELETE SET NULL
+);
+
+CREATE TABLE pedido_itens (
+    id_pedido_item serial PRIMARY KEY,
+    quantidade integer,
+    fk_pedidos_id_pediido integer,
+    fk_item_id_items integer,
+    CONSTRAINT fk_pi_pedidos FOREIGN KEY (fk_pedidos_id_pediido) REFERENCES pedidos (id_pedido) ON DELETE CASCADE,
+    CONSTRAINT fk_pi_item FOREIGN KEY (fk_item_id_items) REFERENCES item (id_items) ON DELETE CASCADE
+);
+
+CREATE TABLE receitas (
+    id_receita serial PRIMARY KEY,
+    quantidade_necessaria decimal,
+    fk_item_id_items integer,
+    fk_produtos_id_produto integer,
+    CONSTRAINT fk_receitas_item FOREIGN KEY (fk_item_id_items) REFERENCES item (id_items) ON DELETE CASCADE,
+    CONSTRAINT fk_receitas_produtos FOREIGN KEY (fk_produtos_id_produto) REFERENCES produtos (id_produto) ON DELETE CASCADE
+);
