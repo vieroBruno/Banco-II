@@ -1,0 +1,230 @@
+Guia de Configuração e Execução do Sistema
+
+O projeto foi desenvolvido utilizando o JDK 17 e banco Postgres rodando no WSL e IDEA Intellij no Windows, por isso foi decidido trazer um passo a passo tanto no Windows como no WSL.
+Este guia detalha os passos para configurar o ambiente e executar o projeto utilizando a IDE IntelliJ IDEA.
+
+Visão Geral dos Requisitos
+
+IDE: IntelliJ IDEA (Community ou Ultimate)
+
+Java: JDK 17
+
+Banco de Dados: PostgreSQL
+
+Driver JDBC: postgresql-42.7.7.jar
+
+Nome do Banco (sugerido): restaurantev2
+
+Usuário do Banco (padrão): postgres
+
+Senha do Banco (sugerida): 123456
+
+Ambiente Windows
+
+Guia para configurar e rodar o projeto no Windows com IntelliJ IDEA.
+
+Passo 1: Instalar o JDK 17
+
+Download: Baixe o instalador do JDK 17 para Windows do Eclipse Temurin (Adoptium).
+
+Link: https://adoptium.net/temurin/releases/?version=17
+
+Baixe o arquivo .msi para Windows x64.
+
+Instalação: Execute o instalador e siga as instruções. Ele configurará o PATH do sistema automaticamente.
+
+Verificação: Abra um Prompt de Comando e digite "java --version" para confirmar a instalação.
+
+Passo 2: Instalar o PostgreSQL
+
+Download: Baixe o instalador do PostgreSQL no site oficial.
+
+Link: https://www.postgresql.org/download/windows/
+
+Instalação: Durante a instalação, defina uma senha para o usuário "postgres".
+
+Importante: Para evitar alterações no código, use a senha "123456". Se usar outra, lembre-se de atualizá-la no arquivo src/repository/jdbc/Conexao.java.
+
+Passo 3: Criar o Banco de Dados e as Tabelas
+
+Abra o pgAdmin 4.
+
+Conecte-se ao seu servidor local com a senha definida no passo anterior.
+
+Crie um novo banco de dados chamado "restaurantev2", ou qualquer nome que preferir.
+
+Abra a Query Tool para o banco criado anteriormente.
+
+Cole e execute o script SQL abaixo para criar toda a estrutura de tabelas.
+
+CREATE TABLE funcionarios (
+id_funcionario serial PRIMARY KEY,
+nome varchar(100),
+cargo varchar(50),
+salario decimal,
+telefone varchar(15)
+);
+
+CREATE TABLE mesas (
+id_mesa serial PRIMARY KEY,
+numero integer UNIQUE NOT NULL,
+capacidade integer
+);
+
+CREATE TABLE produtos (
+id_produto serial PRIMARY KEY,
+nome varchar(100),
+unidade_medida varchar(20),
+quantidade decimal
+);
+
+CREATE TABLE item (
+id_items serial PRIMARY KEY,
+nome varchar(100),
+preco_venda decimal,
+descricao varchar(255)
+);
+
+CREATE TABLE pedidos (
+id_pedido serial PRIMARY KEY,
+data_pedido timestamp,
+status varchar(50),
+fk_mesas_id_mesa integer,
+fk_funcionarios_id_funcionario integer,
+CONSTRAINT fk_pedidos_mesas FOREIGN KEY (fk_mesas_id_mesa) REFERENCES mesas (id_mesa) ON DELETE CASCADE,
+CONSTRAINT fk_pedidos_funcionarios FOREIGN KEY (fk_funcionarios_id_funcionario) REFERENCES funcionarios (id_funcionario) ON DELETE SET NULL
+);
+
+CREATE TABLE pedido_itens (
+id_pedido_item serial PRIMARY KEY,
+quantidade integer,
+fk_pedidos_id_pediido integer,
+fk_item_id_items integer,
+CONSTRAINT fk_pi_pedidos FOREIGN KEY (fk_pedidos_id_pediido) REFERENCES pedidos (id_pedido) ON DELETE CASCADE,
+CONSTRAINT fk_pi_item FOREIGN KEY (fk_item_id_items) REFERENCES item (id_items) ON DELETE CASCADE
+);
+
+CREATE TABLE receitas (
+id_receita serial PRIMARY KEY,
+quantidade_necessaria decimal,
+fk_item_id_items integer,
+fk_produtos_id_produto integer,
+CONSTRAINT fk_receitas_item FOREIGN KEY (fk_item_id_items) REFERENCES item (id_items) ON DELETE CASCADE,
+CONSTRAINT fk_receitas_produtos FOREIGN KEY (fk_produtos_id_produto) REFERENCES produtos (id_produto) ON DELETE CASCADE
+);
+
+Passo 4: Configurar o Projeto no IntelliJ IDEA
+
+Estrutura de Pastas: Crie uma pasta C:\RestauranteApp. Dentro dela, coloque a pasta "src" do projeto.
+
+Link para baixar o arquivo src.zip: https://raw.githubusercontent.com/vieroBruno/Banco-II/main/docs/src.zip
+
+Driver JDBC: Baixe o arquivo postgresql-42.7.7.jar do site oficial do PostgreSQL (https://jdbc.postgresql.org/download/) e coloque-o também dentro de C:\RestauranteApp.
+
+Abra no IntelliJ:
+
+Vá em File > Open... e selecione a pasta C:\RestauranteApp.
+
+Adicione o Driver JDBC como Biblioteca:
+
+Vá em File > Project Structure... (ou pressione Ctrl+Alt+Shift+S).
+
+No menu lateral, selecione Libraries.
+
+Clique no "+" e escolha Java.
+
+Navegue até C:\RestauranteApp e selecione o arquivo postgresql-42.7.7.jar.
+
+Clique em OK para confirmar.
+
+Compile e Execute:
+
+Encontre o arquivo Menu.java na árvore de projeto (dentro de src/view).
+
+Clique com o botão direito sobre o arquivo Menu.java.
+
+Selecione a opção "Run 'Menu.main()'".
+
+O IntelliJ IDEA irá compilar e executar o sistema automaticamente. O menu principal aparecerá no painel "Run" na parte inferior da IDE.
+
+Ambiente WSL (Ubuntu/Debian)
+
+Guia para configurar o projeto no WSL e executá-lo via IntelliJ IDEA no Windows.
+
+Passo 1: Instalar o JDK 17
+
+Abra o terminal do WSL.
+
+Atualize os pacotes e instale o JDK:
+sudo apt update
+sudo apt install openjdk-17-jdk
+
+Verifique a instalação:
+java --version
+
+Passo 2: Instalar e Configurar o PostgreSQL
+
+Instale o PostgreSQL:
+sudo apt install postgresql postgresql-contrib
+
+Inicie o serviço do PostgreSQL:
+sudo service postgresql start
+
+Defina a senha do usuário "postgres":
+
+Acesse o psql: sudo -u postgres psql
+
+Dentro do psql, execute o comando: \password postgres
+
+Digite uma senha e confirme.
+
+Saia do psql: \q
+
+Passo 3: Criar o Banco de Dados e as Tabelas
+
+Crie o banco de dados "restauranteV2" ou o nome que preferir:
+sudo -u postgres createdb nomeDoBanco
+
+Conecte-se ao banco:
+sudo -u postgres psql -d nomeDoBanco
+
+No psql, cole os scripts SQL fornecido no passo a passo do Windows para criar as tabelas e inserir os dados. Após a execução, saia com \q.
+
+Passo 4: Configurar o Projeto no IntelliJ IDEA (com WSL)
+
+Estrutura de Pastas (no WSL): No seu terminal WSL, crie uma pasta ~/RestauranteApp, coloque a pasta "src" dentro dela e baixe o driver JDBC:
+mkdir ~/RestauranteApp
+cd ~/RestauranteApp
+
+Coloque sua pasta 'src' aqui
+wget https://jdbc.postgresql.org/download/postgresql-42.7.7.jar
+
+Abra o Projeto no IntelliJ:
+
+Vá em File > Open....
+
+Na barra de endereço do explorador de arquivos, digite \wsl$ e pressione Enter.
+
+Navegue pela sua distribuição (ex: Ubuntu) até a pasta do projeto: \home<seu_usuario_wsl>\RestauranteApp.
+
+Clique em OK para abrir o projeto.
+
+Configure o JDK do WSL:
+
+Vá em File > Project Structure....
+
+Em Project Settings > Project, no campo SDK, clique em Add SDK > JDK....
+
+O IntelliJ deve detectar automaticamente os JDKs instalados no WSL. Selecione o OpenJDK 17 do WSL (o caminho será algo como \wsl$\Ubuntu\usr\lib\jvm...).
+
+Adicione o Driver JDBC como Biblioteca:
+
+Siga os mesmos passos da configuração para Windows (File > Project Structure... > Libraries), mas ao adicionar o .jar, navegue pelo caminho \wsl$ até a pasta do seu projeto para selecionar o arquivo postgresql-42.7.7.jar.
+
+Compile e Execute:
+
+Encontre o arquivo Menu.java (src/view/Menu.java).
+
+Clique com o botão direito e selecione "Run 'Menu.main()'".
+
+O IntelliJ usará o JDK configurado dentro do WSL para compilar e executar seu projeto, conectando-se ao banco de dados PostgreSQL que também está rodando no WSL.
