@@ -42,7 +42,6 @@ Guia para configurar e rodar o projeto no Windows com IntelliJ IDEA.
 4.  Abra a **Query Tool** para o banco criado anteriormente.
 5.  Cole e execute o script SQL abaixo para criar toda a estrutura de tabelas.
     ```sql
-    -- SCRIPT SQL CORRIGIDO --
 
     CREATE TABLE funcionarios (
         id_funcionario serial PRIMARY KEY,
@@ -191,5 +190,6 @@ Guia para configurar o projeto no WSL e executá-lo via IntelliJ IDEA no Windows
 5.  **Compile e Execute:**
     - Encontre o arquivo `Menu.java` (`src/view/Menu.java`).
     - Clique com o botão direito e selecione **`Run 'Menu.main()'`**.
+
 
 O IntelliJ usará o JDK configurado dentro do WSL para compilar e executar seu projeto, conectando-se ao banco de dados PostgreSQL que também está rodando no WSL.
