@@ -44,11 +44,11 @@ Guia para configurar e rodar o projeto no Windows com IntelliJ IDEA.
     ```sql
 
     CREATE TABLE funcionarios (
-        id_funcionario serial PRIMARY KEY,
-        nome varchar(100),
-        cargo varchar(50),
-        salario decimal,
-        telefone varchar(15)
+    id_funcionario serial PRIMARY KEY,
+    nome varchar(100),
+    cargo varchar(50),
+    salario decimal,
+    telefone varchar(15)
     );
     
     CREATE TABLE mesas (
@@ -134,7 +134,7 @@ Guia para configurar e rodar o projeto no Windows com IntelliJ IDEA.
     ('Queijo Cheddar', 'Gramas', 2000.0),
     ('Alface', 'Gramas', 1000.0),
     ('Tomate', 'Gramas', 2000.0),
-    ('Refrigerante Cola', 'Mililitros', 17500.0);
+    ('Refrigerante Cola', 'Unidades', 300);
     
     INSERT INTO item (nome, preco_venda, descricao) VALUES
     ('Batata Frita Média', 15.00, 'Porção de 300g de batata frita crocante'),
@@ -143,23 +143,23 @@ Guia para configurar e rodar o projeto no Windows com IntelliJ IDEA.
     ('Refrigerante Lata', 6.00, 'Lata de 350ml');
     
     INSERT INTO receitas (fk_item_id_items, fk_produtos_id_produto, quantidade_necessaria) VALUES
-    (1, 1, 300),
-    (1, 3, 2);
+    (1, 1, 0.3),
+    (1, 3, 2.5);
     
     INSERT INTO receitas (fk_item_id_items, fk_produtos_id_produto, quantidade_necessaria) VALUES
-    (2, 4, 80),
+    (2, 4, 1),
     (2, 5, 150),
     (2, 6, 20);
     
     INSERT INTO receitas (fk_item_id_items, fk_produtos_id_produto, quantidade_necessaria) VALUES
-    (3, 4, 80),
+    (3, 4, 1),
     (3, 5, 150),
     (3, 6, 20),
     (3, 7, 30),
     (3, 8, 40);
     
     INSERT INTO receitas (fk_item_id_items, fk_produtos_id_produto, quantidade_necessaria) VALUES
-    (4, 9, 350);
+    (4, 9, 1);
     
     INSERT INTO pedidos (data_pedido, status, fk_mesas_id_mesa, fk_funcionarios_id_funcionario) VALUES
     ('2025-09-20', 'Pago', 1, 1),
@@ -287,5 +287,6 @@ Guia para configurar o projeto no WSL e executá-lo via IntelliJ IDEA no Windows
 
 
 O IntelliJ usará o JDK configurado dentro do WSL para compilar e executar seu projeto, conectando-se ao banco de dados PostgreSQL que também está rodando no WSL.
+
 
 
