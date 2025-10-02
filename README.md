@@ -50,27 +50,27 @@ Guia para configurar e rodar o projeto no Windows com IntelliJ IDEA.
         salario decimal,
         telefone varchar(15)
     );
-
+    
     CREATE TABLE mesas (
         id_mesa serial PRIMARY KEY,
         numero integer UNIQUE NOT NULL,
         capacidade integer
     );
-
+    
     CREATE TABLE produtos (
         id_produto serial PRIMARY KEY,
         nome varchar(100),
         unidade_medida varchar(20),
         quantidade decimal
     );
-
+    
     CREATE TABLE item (
         id_items serial PRIMARY KEY,
         nome varchar(100),
         preco_venda decimal,
         descricao varchar(255)
     );
-
+    
     CREATE TABLE pedidos (
         id_pedido serial PRIMARY KEY,
         data_pedido timestamp,
@@ -80,7 +80,7 @@ Guia para configurar e rodar o projeto no Windows com IntelliJ IDEA.
         CONSTRAINT fk_pedidos_mesas FOREIGN KEY (fk_mesas_id_mesa) REFERENCES mesas (id_mesa) ON DELETE CASCADE,
         CONSTRAINT fk_pedidos_funcionarios FOREIGN KEY (fk_funcionarios_id_funcionario) REFERENCES funcionarios (id_funcionario) ON DELETE SET NULL
     );
-
+    
     CREATE TABLE pedido_itens (
         id_pedido_item serial PRIMARY KEY,
         quantidade integer,
@@ -89,7 +89,7 @@ Guia para configurar e rodar o projeto no Windows com IntelliJ IDEA.
         CONSTRAINT fk_pi_pedidos FOREIGN KEY (fk_pedidos_id_pediido) REFERENCES pedidos (id_pedido) ON DELETE CASCADE,
         CONSTRAINT fk_pi_item FOREIGN KEY (fk_item_id_items) REFERENCES item (id_items) ON DELETE CASCADE
     );
-
+    
     CREATE TABLE receitas (
         id_receita serial PRIMARY KEY,
         quantidade_necessaria decimal,
@@ -98,6 +98,100 @@ Guia para configurar e rodar o projeto no Windows com IntelliJ IDEA.
         CONSTRAINT fk_receitas_item FOREIGN KEY (fk_item_id_items) REFERENCES item (id_items) ON DELETE CASCADE,
         CONSTRAINT fk_receitas_produtos FOREIGN KEY (fk_produtos_id_produto) REFERENCES produtos (id_produto) ON DELETE CASCADE
     );
+    
+    DELETE FROM pedido_itens;
+    DELETE FROM receitas;
+    DELETE FROM pedidos;
+    DELETE FROM item;
+    DELETE FROM produtos;
+    DELETE FROM funcionarios;
+    DELETE FROM mesas;
+    
+    ALTER SEQUENCE funcionarios_id_funcionario_seq RESTART WITH 1;
+    ALTER SEQUENCE mesas_id_mesa_seq RESTART WITH 1;
+    ALTER SEQUENCE produtos_id_produto_seq RESTART WITH 1;
+    ALTER SEQUENCE item_id_items_seq RESTART WITH 1;
+    ALTER SEQUENCE pedidos_id_pedido_seq RESTART WITH 1;
+    
+    INSERT INTO funcionarios (nome, cargo, salario, telefone) VALUES
+    ('João Silva', 'Garçom', 2200.00, '47999887766'),
+    ('Maria Oliveira', 'Garçonete', 2250.00, '47988776655'),
+    ('Carlos Pereira', 'Gerente', 4500.00, '47977665544');
+    
+    INSERT INTO mesas (numero, capacidade) VALUES
+    (1, 4),
+    (2, 2),
+    (3, 6),
+    (4, 4),
+    (5, 8);
+    
+    INSERT INTO produtos (nome, unidade_medida, quantidade) VALUES
+    ('Batata', 'Quilogramas', 20.0),
+    ('Óleo de Soja', 'Litros', 10.0),
+    ('Sal', 'Gramas', 50.0),
+    ('Pão de Hambúrguer', 'Unidades', 50),
+    ('Carne de Hambúrguer', 'Gramas', 7500.0),
+    ('Queijo Cheddar', 'Gramas', 2000.0),
+    ('Alface', 'Gramas', 1000.0),
+    ('Tomate', 'Gramas', 2000.0),
+    ('Refrigerante Cola', 'Mililitros', 17500.0);
+    
+    INSERT INTO item (nome, preco_venda, descricao) VALUES
+    ('Batata Frita Média', 15.00, 'Porção de 300g de batata frita crocante'),
+    ('Hambúrguer Clássico', 25.00, 'Pão, carne 150g e queijo cheddar'),
+    ('X-Salada', 28.00, 'Pão, carne 150g, queijo, alface e tomate'),
+    ('Refrigerante Lata', 6.00, 'Lata de 350ml');
+    
+    INSERT INTO receitas (fk_item_id_items, fk_produtos_id_produto, quantidade_necessaria) VALUES
+    (1, 1, 300),
+    (1, 3, 2);
+    
+    INSERT INTO receitas (fk_item_id_items, fk_produtos_id_produto, quantidade_necessaria) VALUES
+    (2, 4, 80),
+    (2, 5, 150),
+    (2, 6, 20);
+    
+    INSERT INTO receitas (fk_item_id_items, fk_produtos_id_produto, quantidade_necessaria) VALUES
+    (3, 4, 80),
+    (3, 5, 150),
+    (3, 6, 20),
+    (3, 7, 30),
+    (3, 8, 40);
+    
+    INSERT INTO receitas (fk_item_id_items, fk_produtos_id_produto, quantidade_necessaria) VALUES
+    (4, 9, 350);
+    
+    INSERT INTO pedidos (data_pedido, status, fk_mesas_id_mesa, fk_funcionarios_id_funcionario) VALUES
+    ('2025-09-20', 'Pago', 1, 1),
+    ('2025-09-21', 'Pago', 3, 2),
+    ('2025-09-21', 'Cancelado', 2, 1),
+    ('2025-09-22', 'Pago', 5, 2),
+    ('2025-09-28', 'Pago', 1, 1),
+    ('2025-09-29', 'Ativo', 4, 2);
+    
+    INSERT INTO pedido_itens (fk_pedidos_id_pediido, fk_item_id_items, quantidade) VALUES
+    (1, 1, 2),
+    (1, 4, 2);
+    
+    INSERT INTO pedido_itens (fk_pedidos_id_pediido, fk_item_id_items, quantidade) VALUES
+    (2, 2, 1),
+    (2, 1, 1),
+    (2, 4, 1);
+    
+    INSERT INTO pedido_itens (fk_pedidos_id_pediido, fk_item_id_items, quantidade) VALUES
+    (3, 3, 1);
+    
+    INSERT INTO pedido_itens (fk_pedidos_id_pediido, fk_item_id_items, quantidade) VALUES
+    (4, 3, 1),
+    (4, 1, 1),
+    (4, 4, 1);
+    
+    INSERT INTO pedido_itens (fk_pedidos_id_pediido, fk_item_id_items, quantidade) VALUES
+    (5, 2, 2),
+    (5, 4, 2);
+    
+    INSERT INTO pedido_itens (fk_pedidos_id_pediido, fk_item_id_items, quantidade) VALUES
+    (6, 1, 1);
     ```
 
 ### Passo 4: Configurar o Projeto no IntelliJ IDEA
@@ -193,3 +287,5 @@ Guia para configurar o projeto no WSL e executá-lo via IntelliJ IDEA no Windows
 
 
 O IntelliJ usará o JDK configurado dentro do WSL para compilar e executar seu projeto, conectando-se ao banco de dados PostgreSQL que também está rodando no WSL.
+
+

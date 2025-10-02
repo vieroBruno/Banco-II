@@ -48,10 +48,9 @@ public class ProdutoView {
     }
 
     private void cadastrar() {
-        System.out.print("Nome: ");
-        String nome = sc.nextLine();
+        String nome = ValidacaoHelper.isStringValida(sc, "Nome: ");
 
-        String unidadeMedida = ValidacaoHelper.lerUnidadeMedidaValida(sc, "Unidade de Medida (Quilogramas, Gramas, Litros, Mililitros): ");
+        String unidadeMedida = ValidacaoHelper.lerUnidadeMedidaValida(sc, "Unidade de Medida (Quilogramas, Gramas, Litros, Mililitros, Unidades): ");
 
         double quantidade = ValidacaoHelper.lerDouble(sc, "Quantidade: ");
 
